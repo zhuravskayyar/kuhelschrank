@@ -2262,6 +2262,36 @@ window.InlineQRCode=req('index');
     }
   }
   function selectedRecipeServings(){return Number($('#recipe-servings').value)||4;}
+
+  // Observed (not official live) produce prices, fetched only for relevant known taxonomy items.
+  const rawProduceNames=new Set(['буряк','картопля','морква','цибуля','помідори','огірки','яблука','банани','лимон','капуста','часник','гарбуз','перець болгарський','баклажан','кабачок']);
+  const rawProduceCache=new Map();
+  let rawRecipeLoadId=0,rawRecipeLoading=false;
+  function rawPriceEstimate(recipeRow){
+    const raw=rawProduceCache.get(recipeFoodKey(recipeRow.ingredient.name));
+    const quantity=baseRecipeUnit(recipeRow.missing,recipeRow.unit);
+    if(!raw||!quantity||quantity.group!=='mass')return null;
+    return Math.round(raw.price*(quantity.n/1000)*100)/100;
+  }
+  async function loadRecipeProducePrices(recipe){
+    const needNames=(recipe.ingredients||[]).map(x=>recipeFoodKey(x.name))
+      .filter((n,i,a)=>rawProduceNames.has(n)&&a.indexOf(n)===i&&!rawProduceCache.has(n)).slice(0,6);
+    if(!needNames.length)return;
+    const requestId=++rawRecipeLoadId;rawRecipeLoading=true;
+    if(selectedCatalogRecipe?.id===recipe.id)$('#recipe-detail-cost').textContent='Перевіряємо доступні спостереження цін у німецьких магазинах…';
+    try{
+      const r=await fetch('/api/raw-ingredient-prices?'+new URLSearchParams({names:needNames.join(',')}));
+      if(!r.ok)return;
+      const data=await r.json();
+      if(requestId!==rawRecipeLoadId)return;
+      for(const obs of data.observations||[]){
+        if(!rawProduceNames.has(obs.name)||!(Number(obs.price)>0))continue;
+        rawProduceCache.set(obs.name,obs);
+      }
+    }catch(e){}finally{
+      if(requestId===rawRecipeLoadId){rawRecipeLoading=false;if(selectedCatalogRecipe?.id===recipe.id)renderRecipeDetail();}
+    }
+  }
   function renderRecipeDetail(){
     const recipe=selectedCatalogRecipe;
     if(!recipe)return;
@@ -2280,18 +2310,27 @@ window.InlineQRCode=req('index');
         'Не вистачає '+(x.missing===null?amount:recipeAmount(x.missing,i.unit)));
       const price=x.latestPrice?' · '+euro(x.latestPrice.price)+' за моєю попередньою ціною':'';
       const sight=x.observed?' · Open Prices: '+euro(x.observed.price)+' ('+esc(x.observed.date)+', ціна упаковки)':'';
+      const raw=rawProduceCache.get(recipeFoodKey(i.name));
+      const kgInfo=raw?' · '+euro(raw.price)+'/кг, '+esc(raw.shop)+(raw.city?' ('+esc(raw.city)+')':'')+', '+esc(raw.date)+' — історичне спостереження':'';
+      const kgSource=raw?.sourceUrl?'<a href="'+esc(raw.sourceUrl)+'" rel="noopener noreferrer" target="_blank" style="display:block;margin-top:2px;font-size:10px;color:#5651a5">Джерело ціни</a>':'';
+
       return '<div class="recipe-ingredient '+(x.enough?'enough':x.uncertain?'unknown':'missing')+'">'+
         '<span class="flag">'+(x.enough?'✓':x.uncertain?'?':'+')+'</span><div class="ing-copy"><b>'+
-        esc(i.name)+'</b><small>'+esc(detail)+esc(price)+sight+'</small></div><span class="amount">'+
+        esc(i.name)+'</b><small>'+esc(detail)+esc(price)+sight+kgInfo+'</small>'+kgSource+'</div><span class="amount">'+
         esc(amount)+'</span></div>';
     }).join('');
     const missing=rows.filter(x=>!x.enough&&!x.uncertain);
-    let sum=0,priced=0;
-    missing.forEach(x=>{if(x.latestPrice){sum+=x.latestPrice.price;priced++}});
-    $('#recipe-detail-cost').textContent=missing.length?
-      (priced?'Орієнтир за твоїми останніми цінами: '+euro(sum)+' за '+priced+' із '+missing.length+' відсутніх позицій. Для решти ціни невідомі.':
-      'Ціну повного кошика поки не порахувати: немає надійних цін усіх відсутніх інгредієнтів.'):
-      'За обліком запасів відсутніх інгредієнтів немає (перевір фактичну наявність).';
+    let sum=0,priced=0,fromRaw=0,fromMy=0;
+    missing.forEach(x=>{
+      if(x.latestPrice){sum+=x.latestPrice.price;priced++;fromMy++;}
+      else{const approximate=rawPriceEstimate(x);if(approximate!==null){sum+=approximate;priced++;fromRaw++;}}
+    });
+    $('#recipe-detail-cost').textContent=rawRecipeLoading?
+      'Шукаємо історичні спостереження цін…':
+      missing.length?
+      (priced?'Частковий орієнтир: '+euro(sum)+' за '+priced+' із '+missing.length+' відсутніх позицій ('+fromMy+' з твоїх чеків, '+fromRaw+' з Open Prices). Це різні магазини, міста та дати — не актуальна вартість кошика.':
+      'Немає надійної ціни для кошика. Додай штрихкоди/чеки або перевір актуальні ціни в магазині.'):
+      'За обліком запасів відсутніх інгредієнтів немає. Перевір фактичну кількість і терміни.';
     $('#recipe-add-missing').disabled=missing.length===0;
     $('#recipe-add-missing').textContent=missing.length?'Додати '+missing.length+' позицій у покупки':'Усе необхідне є';
     if(recipe.steps?.length){
@@ -2311,6 +2350,7 @@ window.InlineQRCode=req('index');
     $('#recipe-servings').value=String(recipe.servings||4);
     renderRecipeDetail();
     $('#recipe-catalog-dialog').showModal();
+    loadRecipeProducePrices(recipe);
   }
   $('#recipe-catalog-dialog').addEventListener('click',e=>{if(e.target===$('#recipe-catalog-dialog'))$('#recipe-catalog-dialog').close()});
   $('#close-recipe-detail').addEventListener('click',()=>$('#recipe-catalog-dialog').close());
