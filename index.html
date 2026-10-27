@@ -147,6 +147,15 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
  .recipe-steps h3{font-size:15px;margin:0 0 10px}
  .recipe-steps ol{padding-left:23px;font-size:12px;line-height:1.6}
  .recipe-source a{color:#544ba6}
+
+.weekly-day{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #ded8df;font-size:12px}
+.weekly-day strong{display:block;font-size:12px;color:#29242c}
+.weekly-day small{display:block;margin-top:4px;font-size:11px;color:#70677a;line-height:1.45}
+.weekly-day-time{margin-left:auto;flex:none;font-weight:800;font-size:11px;color:#514784}
+.weekly-menu-home{border:2px solid #2d2a2e;border-radius:14px;margin:0 0 22px;background:#ddf0db;padding:13px 14px;box-shadow:3px 3px 0 #2b252b}
+.weekly-menu-home strong{font-size:13px}.weekly-menu-home p{font-size:11px;line-height:1.5;margin:6px 0 0}
+.weekly-menu-home button{border:1px solid #353038;border-radius:8px;background:#fff;padding:7px 10px;font-weight:750;margin-top:7px;font-size:11px}
+.weekly-budget-row{display:flex;gap:9px;flex-wrap:wrap;margin:9px 0}.weekly-budget-row span{background:#fff;border:1px solid #e1dade;padding:7px 10px;border-radius:8px}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -163,7 +172,7 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
       <div class="hero"><div class="hero-top"><div><p class="hero-label">Зараз у холодильнику</p><div class="hero-number"><span id="hero-count">0</span><span class="hero-measure">продуктів</span></div><div class="hero-unit" id="hero-unit">найменувань у списку</div></div><span class="hero-illustration" aria-hidden="true">❋</span></div><div class="hero-stats"><button class="mini-stat" id="hero-shopping-shortcut" type="button"><span class="mini-symbol">↗</span><span><b id="hero-need">0</b> докупити</span><span class="stat-arrow">→</span></button><button class="mini-stat" id="hero-expiry-shortcut" type="button"><span class="mini-symbol">◷</span><span><b id="hero-expiry">0</b> скоро спливе</span><span class="stat-arrow">→</span></button></div></div>
       <div class="home-actions"><button type="button" class="action-add" id="home-add"><span class="action-icon">＋</span><span>Додати продукт</span><span class="action-arrow">↗</span></button><button type="button" class="action-cart" id="home-shopping" aria-label="Відкрити покупки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M3 5h2l2.6 11h10.5l2.1-8H6M9 20h.01M17 20h.01" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="smart-actions"><button class="smart-trigger" id="home-barcode" type="button"><span class="big">▥</span><span>Сканувати<br>штрихкод</span></button><button class="smart-trigger" id="home-receipt" type="button"><span class="big">▤</span><span>Зчитати<br>чек</span></button></div>
-      <form id="home-recipe-search" class="home-recipe-search"><label for="home-recipe-input">Що хочеш приготувати?</label><div class="home-recipe-controls"><input id="home-recipe-input" type="search" placeholder="Наприклад, борщ або деруни" maxlength="65" autocomplete="off"/><button type="submit" aria-label="Знайти інгредієнти">Знайти →</button></div><small>Шукаємо справжні рецептурні записи, порівнюємо з твоїм холодильником.</small></form><div class="between folders-title"><h2 class="section-heading">Мої полиці <span class="section-doodle">✳</span></h2><span class="subtle-hint">Обери категорію</span></div>
+      <form id="home-recipe-search" class="home-recipe-search"><label for="home-recipe-input">Що хочеш приготувати?</label><div class="home-recipe-controls"><input id="home-recipe-input" type="search" placeholder="Наприклад, борщ або деруни" maxlength="65" autocomplete="off"/><button type="submit" aria-label="Знайти інгредієнти">Знайти →</button></div><small>Шукаємо справжні рецептурні записи, порівнюємо з твоїм холодильником.</small></form><div id="weekly-menu-home" class="weekly-menu-home" hidden></div><div class="between folders-title"><h2 class="section-heading">Мої полиці <span class="section-doodle">✳</span></h2><span class="subtle-hint">Обери категорію</span></div>
       <div class="folder-grid" id="folder-grid" aria-label="Категорії продуктів">
         <button type="button" class="folder-card all selected" data-folder="all"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">▦</span><span class="folder-count" data-folder-count="all">0</span></span><span class="folder-name">Усі продукти</span><span class="folder-arrow">↗</span></button>
         <button type="button" class="folder-card dairy" data-folder="dairy"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🥛</span><span class="folder-count" data-folder-count="dairy">0</span></span><span class="folder-name">Молочне</span><span class="folder-arrow">↗</span></button>
@@ -203,7 +212,7 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
         <button class="assist-tile" id="smart-expiry"><span class="glyph">◷</span><strong>Знайти дату</strong><small>Фото упаковки та OCR</small></button>
         <button class="assist-tile" id="smart-recipes"><span class="glyph">♨</span><strong>Що приготувати</strong><small>Рецепти з твоїх продуктів</small></button>
       </div>
-      <div class="smart-panel recipe-catalog" id="recipe-catalog-anchor"><div class="between"><h3>Знайти страву</h3><span class="badge-source">КАТАЛОГ</span></div><p class="smart-caption">Введи назву страви — покажемо інгредієнти, які є вдома і які треба докупити. Дані цін показуємо тільки якщо маємо джерело.</p><label class="field-label" for="catalog-recipe-query">Пошук рецепта</label><input class="smart-input" id="catalog-recipe-query" type="search" placeholder="Борщ, деруни, олів'є…" maxlength="65" autocomplete="off"/><div class="catalog-categories" id="catalog-recipe-categories"><button type="button" data-recipe-category="all" class="active">Усі</button><button type="button" data-recipe-category="Супи">Супи</button><button type="button" data-recipe-category="Основні">Основні</button><button type="button" data-recipe-category="Салати">Салати</button><button type="button" data-recipe-category="Сніданки">Сніданки</button><button type="button" data-recipe-category="Випічка">Випічка</button></div><p class="smart-caption" id="catalog-status" role="status" aria-live="polite">Завантажуємо каталог рецептів…</p><div class="catalog-results" id="catalog-results"></div></div><div class="smart-panel"><div class="between"><h3>Що варто зробити</h3><span class="badge-source">АВТО</span></div><div id="smart-insights"></div></div>
+      <div class="smart-panel" id="weekly-menu-panel"><div class="between"><h3>Наше меню на тиждень</h3><span class="badge-source">НА ДВОХ</span></div><p class="smart-caption" id="weekly-menu-note">Одна повноцінна страва й один перекус. Не означає, що продукти вже куплені.</p><div id="weekly-menu-rows"></div><div id="weekly-menu-budget" class="smart-caption"></div></div><div class="smart-panel recipe-catalog" id="recipe-catalog-anchor"><div class="between"><h3>Знайти страву</h3><span class="badge-source">КАТАЛОГ</span></div><p class="smart-caption">Введи назву страви — покажемо інгредієнти, які є вдома і які треба докупити. Дані цін показуємо тільки якщо маємо джерело.</p><label class="field-label" for="catalog-recipe-query">Пошук рецепта</label><input class="smart-input" id="catalog-recipe-query" type="search" placeholder="Борщ, деруни, олів'є…" maxlength="65" autocomplete="off"/><div class="catalog-categories" id="catalog-recipe-categories"><button type="button" data-recipe-category="all" class="active">Усі</button><button type="button" data-recipe-category="Супи">Супи</button><button type="button" data-recipe-category="Основні">Основні</button><button type="button" data-recipe-category="Салати">Салати</button><button type="button" data-recipe-category="Сніданки">Сніданки</button><button type="button" data-recipe-category="Випічка">Випічка</button></div><p class="smart-caption" id="catalog-status" role="status" aria-live="polite">Завантажуємо каталог рецептів…</p><div class="catalog-results" id="catalog-results"></div></div><div class="smart-panel"><div class="between"><h3>Що варто зробити</h3><span class="badge-source">АВТО</span></div><div id="smart-insights"></div></div>
       <div class="smart-panel" id="recipes-anchor"><div class="between"><h3>Ідеї на вечерю</h3><button class="text-btn" id="refresh-recipes" type="button">Оновити ↗</button></div><div class="recipe-list" id="recipe-list"></div><p class="smart-caption">Це підбір за назвами продуктів, не перевірка реальної придатності чи безпеки їжі.</p></div>
       <div class="smart-panel"><h3>Спитай Поличку ✳</h3><p>Можна використати NVIDIA NIM через захищену функцію Vercel. Без ключа працює локальний підбір рецептів вище.</p><label class="field-label" for="ai-question">Твоє питання</label><textarea class="smart-input" id="ai-question" rows="3" style="height:87px;resize:vertical" maxlength="450" placeholder="Що приготувати на вечерю без походу в магазин?"></textarea><button class="primary" type="button" id="ask-ai">Отримати пораду</button><div id="ai-response" class="smart-output" hidden></div><p class="smart-caption">ШІ доступний лише після налаштування NVIDIA та авторизованого Telegram-входу; не надсилай сюди особисті дані.</p></div>
       <div class="smart-panel"><h3>Витрати та покупки</h3><div class="summary-grid"><div class="summary-box"><small>За чеками (30 днів)</small><b id="spent-30">0 €</b></div><div class="summary-box"><small>Чеків у базі</small><b id="receipts-count">0</b></div></div><label class="field-label" for="monthly-budget">Бюджет продуктів на місяць, €</label><div class="smart-row"><input class="smart-input" id="monthly-budget" type="number" min="0" max="100000" step="1" value="0"><button class="outline-small" type="button" id="save-budget">Зберегти</button></div><p id="budget-hint" class="smart-caption"></p></div>
@@ -1541,15 +1550,25 @@ window.InlineQRCode=req('index');
   }
   const validTimestamp=value=>typeof value==='string'&&!Number.isNaN(Date.parse(value))?value:new Date().toISOString();
   function tombstones(raw){if(!raw||typeof raw!=='object'||Array.isArray(raw))return {};return Object.fromEntries(Object.entries(raw).filter(([id,at])=>id&&typeof at==='string'&&!Number.isNaN(Date.parse(at))).sort((a,b)=>Date.parse(b[1])-Date.parse(a[1])).slice(0,5000).map(([id,at])=>[String(id).slice(0,100),at]));}
+  function normalizeWeeklyMenu(input){
+    if(!input||typeof input!=='object')return {startDate:'',days:[],estimatedVerifiedSubtotal:null,unpriced:[],updatedAt:'1970-01-01T00:00:00.000Z'};
+    const days=(Array.isArray(input.days)?input.days:[]).slice(0,7).map(x=>({
+      day:String(x.day||'').slice(0,24),main:String(x.main||'').slice(0,110),snack:String(x.snack||'').slice(0,110),
+      minutes:Math.max(0,Math.min(120,Number(x.minutes)||0))
+    }));
+    return {startDate:String(input.startDate||'').slice(0,10),days,estimatedVerifiedSubtotal:Number.isFinite(Number(input.estimatedVerifiedSubtotal))?Math.max(0,Number(input.estimatedVerifiedSubtotal)):null,
+      unpriced:Array.isArray(input.unpriced)?input.unpriced.slice(0,30).map(x=>String(x).slice(0,75)):[],
+      updatedAt:validTimestamp(input.updatedAt)};
+  }
   function normalize(raw){
     if(!raw||!Array.isArray(raw.items)||!Array.isArray(raw.shopping))throw Error('Неправильний формат');
     const items=raw.items.slice(0,600).map(x=>{const item=validateItem(x);return item?{...item,updatedAt:validTimestamp(x.updatedAt)}:null;}).filter(Boolean);
     const shopping=raw.shopping.slice(0,600).filter(i=>i&&String(i.name||'').trim()).map(i=>({id:String(i.id||uid()).slice(0,100),name:String(i.name).trim().slice(0,65),updatedAt:validTimestamp(i.updatedAt)}));
     const receipts=Array.isArray(raw.receipts)?raw.receipts.slice(-100).filter(x=>x&&Number.isFinite(Number(x.total))).map(x=>({id:String(x.id||uid()).slice(0,100),date:String(x.date||''),store:validStore(x.store)||detectStore(x.store),total:Math.max(0,Math.min(100000,Number(x.total))),updatedAt:validTimestamp(x.updatedAt)})):[];
     const events=Array.isArray(raw.events)?raw.events.slice(-100).filter(x=>x&&x.text).map(x=>({id:String(x.id||`${x.at||''}:${x.text}`).slice(0,100),text:String(x.text).slice(0,150),at:String(x.at||'').slice(0,40),updatedAt:validTimestamp(x.updatedAt||x.at)})):[];
-    return {version:4,items,shopping,receipts,events,settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0)),updatedAt:validTimestamp(raw.settings?.updatedAt)},deleted:{items:tombstones(raw.deleted?.items),shopping:tombstones(raw.deleted?.shopping),receipts:tombstones(raw.deleted?.receipts),events:tombstones(raw.deleted?.events)}};
+    return {version:4,items,shopping,receipts,events,weeklyMenu:normalizeWeeklyMenu(raw.weeklyMenu),settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0)),updatedAt:validTimestamp(raw.settings?.updatedAt)},deleted:{items:tombstones(raw.deleted?.items),shopping:tombstones(raw.deleted?.shopping),receipts:tombstones(raw.deleted?.receipts),events:tombstones(raw.deleted?.events)}};
   }
-  const emptyState=()=>({version:4,items:[],shopping:[],receipts:[],events:[],settings:{budget:0},deleted:{items:{},shopping:{},receipts:{},events:{}}});
+  const emptyState=()=>({version:4,items:[],shopping:[],receipts:[],events:[],weeklyMenu:{startDate:'',days:[],estimatedVerifiedSubtotal:null,unpriced:[]},settings:{budget:0},deleted:{items:{},shopping:{},receipts:{},events:{}}});
   let state;try{const saved=localStorage.getItem(STORAGE_KEY);const parsed=saved?JSON.parse(saved):emptyState();state=normalize(parsed?.demo===true?emptyState():parsed);}catch(e){state=normalize(emptyState());}
   let tab='stock', filter='all', editing=null, toastTimer;
   let syncRevision=0,syncReady=false,syncInProgress=false,syncQueued=false,syncApplyingRemote=false,syncTimer=null,localGeneration=0;
@@ -1575,6 +1594,7 @@ window.InlineQRCode=req('index');
       if(entries.length>5000)state.deleted[key]=Object.fromEntries(entries.sort((a,b)=>Date.parse(b[1])-Date.parse(a[1])).slice(0,5000));
     }
     if(previous.settings?.budget!==state.settings?.budget)state.settings.updatedAt=now;
+    if(JSON.stringify({...previous.weeklyMenu,updatedAt:''})!==JSON.stringify({...state.weeklyMenu,updatedAt:''}))state.weeklyMenu.updatedAt=now;
     const changed=before!==JSON.stringify(state);
     lastSavedSnapshot=JSON.stringify(state);
     if(changed)localGeneration++;
@@ -1618,7 +1638,25 @@ window.InlineQRCode=req('index');
     $('#expiry-list').innerHTML=items.length?items.map(i=>{const d=daysLeft(i.expiry),dt=new Date(i.expiry+'T00:00:00');return `<article class="expiry-card ${d<=3?'urgent':''}"><div class="expiry-date"><b>${dt.getDate()}</b><small>${dt.toLocaleDateString('uk-UA',{month:'short'})}</small></div><div class="expiry-detail"><b>${esc(i.name)}</b><p>${d<0?'Термін уже минув':d===0?'Останній день':d===1?'Залишився 1 день':`Залишилося ${d} днів`} · ${fmt(i.qty)} ${esc(i.unit)}</p></div><span>${d<=1?'⚠️':'🍃'}</span></article>`;}).join(''):`<div class="empty"><div class="empty-illustration">🌿</div><b>Нічого термінового</b><p>Немає продуктів із зазначеним терміном, що спливає за 7 днів.</p></div>`;
     const unknown=state.items.filter(i=>i.qty>0&&!i.expiry);$('#no-expiry-list').innerHTML=unknown.length?unknown.map(i=>`<article class="buy-item">${productPicture(i)}<div class="buy-info"><b>${esc(i.name)}</b><p>${fmt(i.qty)} ${esc(i.unit)} · дата не вказана</p></div><button type="button" class="text-btn" data-action="edit" data-id="${esc(i.id)}">Додати дату</button></article>`).join(''):`<p class="notice">У всіх наявних продуктів зазначено дату або список порожній.</p>`;
   }
-  function render(){renderStock();renderShopping();renderPlan();renderSmart();}
+  
+  function renderWeeklyMenu(){
+    const w=state.weeklyMenu||{days:[]},container=$('#weekly-menu-rows'),home=$('#weekly-menu-home');
+    if(!w.days?.length){
+      container.innerHTML='<p class="smart-caption">Меню ще не збережене. Повернися до чату адміністратора «Полички».</p>';
+      $('#weekly-menu-budget').textContent='';home.hidden=true;return;
+    }
+    const dates=['Понеділок','Вівторок','Середа','Четвер','П’ятниця','Субота','Неділя'];
+    container.innerHTML=w.days.map((d,i)=>'<div class="weekly-day"><span><strong>'+esc(d.day||dates[i])+': '+esc(d.main)+'</strong><small>Перекус: '+esc(d.snack)+'</small></span><span class="weekly-day-time">'+(d.minutes?esc(d.minutes)+' хв':'')+'</span></div>').join('');
+    let budget='';if(w.estimatedVerifiedSubtotal!==null)budget='Вартість позицій із підтвердженими цінами: '+euro(w.estimatedVerifiedSubtotal)+'. ';
+    if(w.unpriced?.length)budget+='Для '+w.unpriced.length+' позицій точних цін поки немає ('+w.unpriced.join(', ')+').';
+    budget+=' Це не остаточна сума на касі: в ній можуть бути акції, різне фасування та товари, які залишаться на наступний тиждень.';
+    $('#weekly-menu-budget').textContent=budget;
+    const today=new Date(),weekDay=(today.getDay()+6)%7,selected=w.days[weekDay]||w.days[0];
+    home.hidden=false;
+    home.innerHTML='<strong>План на сьогодні: '+esc(selected.main)+'</strong><p>Перекус: '+esc(selected.snack)+' · '+(selected.minutes?esc(selected.minutes)+' хв':'')+'</p><button type="button" id="open-weekly-menu">Усе меню →</button>';
+    $('#open-weekly-menu').addEventListener('click',()=>{setTab('smart');$('#weekly-menu-panel').scrollIntoView({behavior:'smooth',block:'start'});});
+  }
+function render(){renderStock();renderShopping();renderPlan();renderSmart();renderWeeklyMenu();}
   function setTab(name){if(!['stock','shopping','plan','smart','qr'].includes(name))return;tab=name;document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='screen-'+tab));document.querySelectorAll('[data-tab]').forEach(b=>{const yes=b.dataset.tab===tab;b.classList.toggle('active',yes);b.setAttribute('aria-current',yes?'page':'false');});window.scrollTo({top:0,behavior:'instant'});}
 
   let photoSelection='',photoSourceUrl='',photoOptions=[],photoRequestId=0;
@@ -1773,6 +1811,7 @@ window.InlineQRCode=req('index');
     }
     const useRight=Date.parse(right.settings.updatedAt)>=Date.parse(left.settings.updatedAt);
     merged.settings=useRight?right.settings:left.settings;
+    merged.weeklyMenu=Date.parse(right.weeklyMenu.updatedAt)>=Date.parse(left.weeklyMenu.updatedAt)?right.weeklyMenu:left.weeklyMenu;
     return normalize(merged);
   }
   function rememberCloudRevision(value){syncRevision=Math.max(0,Number(value)||0);try{localStorage.setItem(CLOUD_REVISION_KEY,String(syncRevision));}catch(e){}}
