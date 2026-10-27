@@ -1556,7 +1556,12 @@ window.InlineQRCode=req('index');
       day:String(x.day||'').slice(0,24),main:String(x.main||'').slice(0,110),snack:String(x.snack||'').slice(0,110),
       minutes:Math.max(0,Math.min(120,Number(x.minutes)||0))
     }));
-    return {startDate:String(input.startDate||'').slice(0,10),days,estimatedVerifiedSubtotal:Number.isFinite(Number(input.estimatedVerifiedSubtotal))?Math.max(0,Number(input.estimatedVerifiedSubtotal)):null,
+    const prices=(Array.isArray(input.prices)?input.prices:[]).slice(0,80).filter(x=>x&&/^weekly-[0-9-]+$/.test(String(x.shoppingId||''))&&Number.isFinite(Number(x.total))&&Number(x.total)>0).map(x=>({
+      shoppingId:String(x.shoppingId).slice(0,75),total:Math.round(Number(x.total)*100)/100,retailer:String(x.retailer||'').slice(0,40),
+      sourceUrl:String(x.sourceUrl||'').startsWith('https://www.aldi-sued.de/')?String(x.sourceUrl).slice(0,400):'',
+      checkedOn:String(x.checkedOn||'').slice(0,10),validUntil:String(x.validUntil||'').slice(0,10)
+    }));
+    return {startDate:String(input.startDate||'').slice(0,10),days,prices,estimatedVerifiedSubtotal:input.estimatedVerifiedSubtotal!==null&&input.estimatedVerifiedSubtotal!==undefined&&Number.isFinite(Number(input.estimatedVerifiedSubtotal))?Math.max(0,Number(input.estimatedVerifiedSubtotal)):null,
       unpriced:Array.isArray(input.unpriced)?input.unpriced.slice(0,30).map(x=>String(x).slice(0,75)):[],
       updatedAt:validTimestamp(input.updatedAt)};
   }
@@ -1568,7 +1573,7 @@ window.InlineQRCode=req('index');
     const events=Array.isArray(raw.events)?raw.events.slice(-100).filter(x=>x&&x.text).map(x=>({id:String(x.id||`${x.at||''}:${x.text}`).slice(0,100),text:String(x.text).slice(0,150),at:String(x.at||'').slice(0,40),updatedAt:validTimestamp(x.updatedAt||x.at)})):[];
     return {version:4,items,shopping,receipts,events,weeklyMenu:normalizeWeeklyMenu(raw.weeklyMenu),settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0)),updatedAt:validTimestamp(raw.settings?.updatedAt)},deleted:{items:tombstones(raw.deleted?.items),shopping:tombstones(raw.deleted?.shopping),receipts:tombstones(raw.deleted?.receipts),events:tombstones(raw.deleted?.events)}};
   }
-  const emptyState=()=>({version:4,items:[],shopping:[],receipts:[],events:[],weeklyMenu:{startDate:'',days:[],estimatedVerifiedSubtotal:null,unpriced:[]},settings:{budget:0},deleted:{items:{},shopping:{},receipts:{},events:{}}});
+  const emptyState=()=>({version:4,items:[],shopping:[],receipts:[],events:[],weeklyMenu:{startDate:'',days:[],prices:[],estimatedVerifiedSubtotal:null,unpriced:[]},settings:{budget:0},deleted:{items:{},shopping:{},receipts:{},events:{}}});
   let state;try{const saved=localStorage.getItem(STORAGE_KEY);const parsed=saved?JSON.parse(saved):emptyState();state=normalize(parsed?.demo===true?emptyState():parsed);}catch(e){state=normalize(emptyState());}
   let tab='stock', filter='all', editing=null, toastTimer;
   let syncRevision=0,syncReady=false,syncInProgress=false,syncQueued=false,syncApplyingRemote=false,syncTimer=null,localGeneration=0;
@@ -1629,7 +1634,13 @@ window.InlineQRCode=req('index');
     [...$('#filters').children].forEach(b=>{b.classList.toggle('active',b.dataset.filter===filter);b.setAttribute('aria-pressed',b.dataset.filter===filter?'true':'false');});
   }
   function shoppingMarkupAuto(i){const need=precision(i.target-i.qty);return `<article class="buy-item"><button class="buy-check" type="button" data-action="bought" data-id="${esc(i.id)}" aria-label="Куплено: ${esc(i.name)}">✓</button>${productPicture(i)}<div class="buy-info"><b>${esc(i.name)}</b><p>Є: ${fmt(i.qty)} ${esc(i.unit)}</p></div><span class="pill">+${fmt(need)} ${esc(i.unit)}</span></article>`;}
-  function shoppingMarkupManual(i){return `<article class="buy-item"><button class="buy-check" type="button" data-action="manualBought" data-id="${esc(i.id)}" aria-label="Прибрати зі списку: ${esc(i.name)}">✓</button><div class="buy-info"><b>${esc(i.name)}</b><p>Додано вручну</p></div><span class="pill note">У списку</span></article>`;}
+  function shoppingMarkupManual(i){
+    const evidence=(state.weeklyMenu?.prices||[]).find(x=>x.shoppingId===i.id);
+    const estimate=evidence?'<p style="color:#24734d;font-weight:750">Орієнтир: '+euro(evidence.total)+' · '+esc(evidence.retailer)+' · '+esc(evidence.checkedOn)+
+      (evidence.validUntil?' · акція до '+esc(evidence.validUntil):'')+
+      (evidence.sourceUrl?' · <a target="_blank" rel="noopener noreferrer" href="'+esc(evidence.sourceUrl)+'">джерело</a>':'')+'</p>':'<p>Ціна ще не підтверджена</p>';
+    return `<article class="buy-item"><button class="buy-check" type="button" data-action="manualBought" data-id="${esc(i.id)}" aria-label="Прибрати зі списку: ${esc(i.name)}">✓</button><div class="buy-info"><b>${esc(i.name)}</b>${estimate}</div><span class="pill note">У списку</span></article>`;
+  }
   function renderShopping(){const automatic=restock(), manual=state.shopping;const count=automatic.length+manual.length;$('#shopping-total').textContent=count;$('#nav-count').textContent=count>99?'99+':count;$('#nav-count').hidden=count===0;
     $('#auto-shopping').innerHTML=automatic.length?automatic.map(shoppingMarkupAuto).join(''):`<div class="empty"><div class="empty-illustration">✓</div><b>Запасів достатньо</b><p>Автоматичний список поки порожній.</p></div>`;
     $('#manual-shopping').innerHTML=manual.length?manual.map(shoppingMarkupManual).join(''):`<div class="empty" style="padding:21px 12px"><b>Поки нічого немає</b><p>Додай покупку у полі нижче.</p></div>`;
