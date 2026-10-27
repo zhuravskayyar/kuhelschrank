@@ -1783,7 +1783,7 @@ window.InlineQRCode=req('index');
     }
     mount.innerHTML=products.slice(0,40).map(i=>{
       const market=i.market, observed=market?.price, recorded=Number(i.price||0);
-      const diff=market&&recorded>0?Math.round((market.price-recorded)*100)/100:null;
+      const sameShop=!!market&&!!i.store&&(market.shopId===i.store||(market.shopId==='aldi'&&i.store.startsWith('aldi')));const diff=sameShop&&recorded>0?Math.round((market.price-recorded)*100)/100:null;
       const dated=market?market.date:'';
       const options=(i.marketOptions||[]).filter(x=>x.shopId&&(!market||x.shopId!==market.shopId)).slice(0,4);
       const purchased=i.purchaseHistory?.length?i.purchaseHistory[i.purchaseHistory.length-1]:null;
