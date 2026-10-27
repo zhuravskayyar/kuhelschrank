@@ -1540,15 +1540,42 @@ window.InlineQRCode=req('index');
       const r=await fetch('/api/product-images?'+params,{signal:controller.signal});
       const data=await r.json();
       if(!r.ok)throw Error(data.error||'Помилка пошуку');
-      if(!barcode&&!(data.candidates||[]).length){const generic=await browserWikiPhoto(name);if(generic)return [generic];}
+      if(!(data.candidates||[]).length){const fallback=await browserFoodFacts(name,barcode);if(fallback.length)return fallback;if(!barcode){const generic=await browserWikiPhoto(name);if(generic)return [generic];}}
       return data.candidates||[];
     }catch(e){
-      if(!barcode){
-        const fallback=await browserWikiPhoto(name);
-        if(fallback)return [fallback];
-      }
+      const off=await browserFoodFacts(name,barcode);
+      if(off.length)return off;
+      if(!barcode){const generic=await browserWikiPhoto(name);if(generic)return [generic];}
       throw e;
     }finally{clearTimeout(timer);}
+  }
+
+  async function browserFoodFacts(name,barcode){
+    const fields='code,product_name,product_name_uk,product_name_de,brands,image_front_url,image_front_small_url,image_url';
+    let url;
+    if(barcode){
+      if(barcode.length<8||barcode.length>14)return [];
+      url='https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(barcode)+'.json?fields='+encodeURIComponent(fields);
+    }else{
+      if(name.length<3)return [];
+      url='https://world.openfoodfacts.org/cgi/search.pl?'+new URLSearchParams({search_terms:name,search_simple:'1',action:'process',json:'1',page_size:'8',fields});
+    }
+    const c=new AbortController(),timer=setTimeout(()=>c.abort(),6500);
+    try{
+      const r=await fetch(url,{signal:c.signal});if(!r.ok)return [];
+      const j=await r.json();
+      const products=barcode?(j.status===1?[j.product]:[]):(j.products||[]);
+      const terms=name.toLocaleLowerCase('uk').split(/\s+/).filter(x=>x.length>=3);
+      return products.map(p=>{
+        const img=approvedImage(p.image_front_url||p.image_front_small_url||p.image_url);
+        const code=String(p.code||'').replace(/\D/g,'');
+        const title=String(p.product_name_uk||p.product_name_de||p.product_name||'').trim();
+        const brand=String(p.brands||'').trim();
+        const all=(title+' '+brand).toLocaleLowerCase('uk');
+        const score=barcode?1:(terms.length?terms.filter(t=>all.includes(t)).length/terms.length:0);
+        return img&&title?{imageUrl:img,barcode:code,name:title.slice(0,90),brand:brand.slice(0,80),score,source:'Open Food Facts',sourceUrl:approvedSource('https://world.openfoodfacts.org/product/'+code)}:null;
+      }).filter(x=>x&&x.score>=.38).sort((a,b)=>b.score-a.score).slice(0,8);
+    }catch{return [];}finally{clearTimeout(timer);}
   }
   async function browserWikiPhoto(name){
     const n=name.toLocaleLowerCase('uk').trim();
