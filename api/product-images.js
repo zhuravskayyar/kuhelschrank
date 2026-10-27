@@ -41,19 +41,30 @@ export default async function handler(req,res){
  if(++usage.count>24)return res.status(429).json({error:'Забагато пошуків. Спробуй через хвилину.'});
  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),10500);
  try{
+  const term=clean(name);
+  const categories=[
+    [/^(молок|milch|milk|lait)/,'en:milks'],
+    [/^(йогурт|joghurt|yogurt|yoghurt)/,'en:yogurts'],
+    [/^(помідор|томат|tomat|tomato)/,'en:tomatoes'],
+    [/^(хліб|brot|bread)/,'en:breads'],
+    [/^(масло|butter)/,'en:butters'],
+    [/^(сир|käse|kaese|cheese)/,'en:cheeses'],
+    [/^(яйц|яйк|eier|eggs)/,'en:eggs'],
+    [/^(шоколад|schokolade|chocolate)/,'en:chocolates'],
+    [/^(вода|wasser|water)/,'en:waters']
+  ];
+  const category=!code&&categories.find(([pattern])=>pattern.test(term))?.[1];
   let url;
   if(code)url=BASE+'/api/v2/product/'+encodeURIComponent(code)+'.json?fields='+encodeURIComponent(fields);
-  else{
-   const p=new URLSearchParams({search_terms:name,search_simple:'1',action:'process',json:'1',page_size:'12',fields});
-   url=BASE+'/cgi/search.pl?'+p;
-  }
-  const r=await fetch(url,{signal:controller.signal,headers:{'User-Agent':'Polychka/2.1 (https://github.com/zhuravskayyar/kuhelschrank)','Accept':'application/json'}});
+  else if(category)url=BASE+'/api/v2/search?'+new URLSearchParams({categories_tags:category,sort_by:'unique_scans_n',page_size:'18',fields});
+  else url=BASE+'/cgi/search.pl?'+new URLSearchParams({search_terms:name,search_simple:'1',action:'process',json:'1',page_size:'12',fields});
+  const r=await fetch(url,{signal:controller.signal,headers:{'User-Agent':'Polychka/2.2 (https://github.com/zhuravskayyar/kuhelschrank)','Accept':'application/json'}});
   if(r.status===429)return res.status(429).json({error:'База товарів тимчасово обмежила пошук'});
   if(!r.ok)throw Error('Open Food Facts '+r.status);
   const data=await r.json();
   const raw=code?(data?.status===1&&data?.product?[data.product]:[]):Array.isArray(data?.products)?data.products:[];
   const candidates=raw.map(p=>format(p,name)).filter(Boolean)
-   .filter(x=>code||x.score>=0.34)
+   .filter(x=>code||category||x.score>=0.34)
    .sort((a,b)=>b.score-a.score).slice(0,8);
   res.setHeader('Cache-Control','public, s-maxage='+(code?86400:3600)+', stale-while-revalidate=86400');
   return res.status(200).json({candidates,source:'Open Food Facts',found:candidates.length>0});
