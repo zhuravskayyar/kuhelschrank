@@ -195,7 +195,7 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
       <div class="form-group"><label for="f-price">Ціна за одиницю, €</label><input id="f-price" type="number" step="0.01" min="0" max="100000" placeholder="0.00"/></div>
       <div class="form-group"><label for="f-place">Де зберігається</label><select id="f-place"><option value="fridge">Холодильник</option><option value="freezer">Морозилка</option><option value="pantry">Комора</option></select></div>
       <div class="form-group full"><label for="f-barcode">Штрихкод (необов'язково)</label><input id="f-barcode" type="text" inputmode="numeric" maxlength="22" placeholder="EAN / GTIN" /></div>
-      <div class="form-group full"><label for="f-note">Нотатка</label><input id="f-note" maxlength="120" placeholder="Наприклад, відкрите сьогодні" /></div><div class="form-group full photo-field"><label>Фото товару з інтернету</label><div class="photo-control"><div id="photo-preview" class="photo-preview"><span>Без фото</span></div><div class="photo-actions"><button id="find-product-photo" class="outline-small" type="button">Знайти реальне фото</button><button id="remove-product-photo" class="outline-small" type="button">Прибрати фото</button><p id="photo-status" class="photo-status" aria-live="polite">Пошук у Open Food Facts — без ШІ та без оплати.</p></div></div><div id="photo-results" class="photo-results" aria-label="Знайдені фото"></div><p class="photo-credit">Фотографії товарів: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a> · CC BY-SA. Обирай правильний бренд.</p></div></div><p class="form-error" id="form-error" role="alert"></p><button class="primary" type="submit">Зберегти продукт</button><button class="danger-btn" id="delete-product" type="button" hidden>Видалити цей продукт</button></form></div></dialog>
+      <div class="form-group full"><label for="f-note">Нотатка</label><input id="f-note" maxlength="120" placeholder="Наприклад, відкрите сьогодні" /></div><div class="form-group full photo-field"><label>Фото товару з інтернету</label><div class="photo-control"><div id="photo-preview" class="photo-preview"><span>Без фото</span></div><div class="photo-actions"><button id="find-product-photo" class="outline-small" type="button">Знайти реальне фото</button><button id="remove-product-photo" class="outline-small" type="button">Прибрати фото</button><p id="photo-status" class="photo-status" aria-live="polite">Пошук у Open Food Facts — без ШІ та без оплати.</p></div></div><div id="photo-results" class="photo-results" aria-label="Знайдені фото"></div><p class="photo-credit">Фото: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a> (CC BY-SA) або <a href="https://commons.wikimedia.org" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a> (ліцензія залежить від файлу). <a id="photo-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Джерело цього фото</a></p></div></div><p class="form-error" id="form-error" role="alert"></p><button class="primary" type="submit">Зберегти продукт</button><button class="danger-btn" id="delete-product" type="button" hidden>Видалити цей продукт</button></form></div></dialog>
 <dialog id="scan-dialog" aria-labelledby="scan-title"><div class="sheet"><div class="sheet-header"><h2 id="scan-title">Сканер</h2><button type="button" id="close-scan" class="close" aria-label="Закрити">×</button></div><p id="scan-hint" class="smart-note">Відскануй упаковку або введи код вручну.</p><div id="barcode-content"><div id="scan-reader" class="scan-area">Камера не запущена</div><div class="smart-row"><button class="outline-small" type="button" id="start-camera">Увімкнути камеру</button><button class="outline-small" type="button" id="stop-camera">Зупинити</button></div><label class="field-label" for="barcode-input">Код товару</label><div class="smart-row"><input id="barcode-input" class="smart-input" type="text" inputmode="numeric" maxlength="22" placeholder="Наприклад 3017620422003"/><button class="outline-small" id="lookup-barcode" type="button">Знайти</button></div><p class="smart-note" id="barcode-status"></p></div><div id="ocr-content" hidden><label class="field-label" for="ocr-file">Зроби фото або вибери з галереї</label><input class="smart-input" id="ocr-file" type="file" accept="image/*" capture="environment"/><p class="smart-note" id="ocr-status">Обробка відбувається локально на твоєму пристрої. Перший запуск завантажує OCR-модель.</p><div id="ocr-preview" hidden><div id="ocr-dates" class="smart-output" hidden></div><div id="receipt-preview-wrap"><p class="smart-note">Перевір знайдені позиції, відредагуй назви та ціни. Зайве зніми галочкою.</p><div id="receipt-rows" class="receipt-table"></div><button class="outline-small" id="add-receipt-row" type="button">+ Додати рядок</button><div class="smart-row"><input class="smart-input" id="receipt-store" type="text" maxlength="60" placeholder="Магазин (необов'язково)"/><input class="smart-input" id="receipt-total" type="number" min="0" max="100000" step="0.01" placeholder="Сума €"/></div><button class="primary" id="import-receipt" type="button">Додати обрані продукти</button></div></div></div></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- QR generator: Kazuhiko Arase's MIT-licensed QRCode implementation, bundled below. -->
@@ -1471,12 +1471,13 @@ window.InlineQRCode=req('index');
   const dateAhead = d => {const n=nowLocal();n.setDate(n.getDate()+d);return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;};
   const uid=()=> {if (globalThis.crypto?.randomUUID) return crypto.randomUUID(); return `${Date.now()}_${Math.random().toString(36).slice(2)}`;};
   // No seeded data: freshly installed household starts with empty inventory.
-  function approvedImage(value){try{const u=new URL(String(value||''));return u.protocol==='https:'&&['images.openfoodfacts.org','static.openfoodfacts.org'].includes(u.hostname)?u.href:'';}catch{return '';}}
+  function approvedImage(value){try{const u=new URL(String(value||''));return u.protocol==='https:'&&['images.openfoodfacts.org','static.openfoodfacts.org','upload.wikimedia.org'].includes(u.hostname)?u.href:'';}catch{return '';}}
+  function approvedSource(value){try{const u=new URL(String(value||''));return u.protocol==='https:'&&['world.openfoodfacts.org','commons.wikimedia.org','en.wikipedia.org'].includes(u.hostname)?u.href:'';}catch{return '';}}
   function validateItem(x){
     if (!x || typeof x!=='object' || !String(x.name||'').trim()) return null;
     const number=(n,fallback)=>Number.isFinite(Number(n))?Math.max(0,Math.min(100000,Number(n))):fallback;
     const min=number(x.min,0), target=Math.max(number(x.target,1),min,.01);
-    return {imageUrl:approvedImage(x.imageUrl),id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120)};
+    return {imageUrl:approvedImage(x.imageUrl),imageSourceUrl:approvedSource(x.imageSourceUrl),id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120)};
   }
   function normalize(raw){if(!raw||!Array.isArray(raw.items)||!Array.isArray(raw.shopping))throw Error('Неправильний формат');return {version:3,items:raw.items.slice(0,600).map(validateItem).filter(Boolean),shopping:raw.shopping.slice(0,600).filter(i=>i&&String(i.name||'').trim()).map(i=>({id:String(i.id||uid()).slice(0,100),name:String(i.name).trim().slice(0,65)})),receipts:Array.isArray(raw.receipts)?raw.receipts.slice(-100).filter(x=>x&&Number.isFinite(Number(x.total))).map(x=>({id:String(x.id||uid()),date:String(x.date||''),store:String(x.store||'').slice(0,60),total:Math.max(0,Math.min(100000,Number(x.total)))})):[],events:Array.isArray(raw.events)?raw.events.slice(-100).filter(x=>x&&x.text).map(x=>({text:String(x.text).slice(0,150),at:String(x.at).slice(0,40)})):[],settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0))}};}
   const emptyState=()=>({version:3,items:[],shopping:[],settings:{budget:0}});
@@ -1523,9 +1524,10 @@ window.InlineQRCode=req('index');
   function render(){renderStock();renderShopping();renderPlan();renderSmart();}
   function setTab(name){if(!['stock','shopping','plan','smart','qr'].includes(name))return;tab=name;document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='screen-'+tab));document.querySelectorAll('[data-tab]').forEach(b=>{const yes=b.dataset.tab===tab;b.classList.toggle('active',yes);b.setAttribute('aria-current',yes?'page':'false');});window.scrollTo({top:0,behavior:'instant'});}
 
-  let photoSelection='',photoOptions=[],photoRequestId=0;
+  let photoSelection='',photoSourceUrl='',photoOptions=[],photoRequestId=0;
   function updatePhotoPreview(){
     const url=approvedImage(photoSelection);
+    const origin=approvedSource(photoSourceUrl);const source=$('#photo-source-link');source.hidden=!url||!origin;if(origin)source.href=origin;
     $('#photo-preview').innerHTML=url?'<img src="'+esc(url)+'" alt="Обране фото товару">':'<span>Без фото</span>';
     document.querySelectorAll('.photo-result').forEach((b,n)=>b.classList.toggle('selected',photoOptions[n]?.imageUrl===url));
   }
@@ -1538,7 +1540,35 @@ window.InlineQRCode=req('index');
       const data=await r.json();
       if(!r.ok)throw Error(data.error||'Помилка пошуку');
       return data.candidates||[];
+    }catch(e){
+      if(!barcode){
+        const fallback=await browserWikiPhoto(name);
+        if(fallback)return [fallback];
+      }
+      throw e;
     }finally{clearTimeout(timer);}
+  }
+  async function browserWikiPhoto(name){
+    const n=name.toLocaleLowerCase('uk').trim();
+    const common=[
+      [/^(молоко|milch|milk|lait)$/,'Milk'],[/^(помідори|помідор|томати|томат|tomaten|tomatoes)$/,'Tomato'],
+      [/^(яйця|яйце|eier|eggs)$/,'Egg'],[/^(сир|käse|cheese)$/,'Cheese'],
+      [/^(огірки|огірок|gurken|cucumber)$/,'Cucumber'],[/^(хліб|brot|bread)$/,'Bread'],
+      [/^(масло|butter)$/,'Butter'],[/^(йогурт|joghurt|yogurt)$/,'Yogurt'],
+      [/^(картопля|kartoffeln|potatoes)$/,'Potato'],[/^(морква|karotten|carrot)$/,'Carrot'],
+      [/^(яблука|яблуко|apfel|apple)$/,'Apple'],[/^(банани|банан|banane|banana)$/,'Banana']
+    ];
+    const title=common.find(([re])=>re.test(n))?.[1];if(!title)return null;
+    const p=new URLSearchParams({action:'query',prop:'pageimages',titles:title,piprop:'thumbnail',pithumbsize:'400',format:'json',redirects:'1',origin:'*'});
+    try{
+      const response=await fetch('https://en.wikipedia.org/w/api.php?'+p);
+      if(!response.ok)return null;
+      const data=await response.json();
+      const entry=Object.values(data?.query?.pages||{}).find(x=>x.thumbnail?.source?.startsWith('https://upload.wikimedia.org/'));
+      if(!entry)return null;
+      const url=approvedImage(entry.thumbnail.source);if(!url)return null;
+      return {imageUrl:url,name,brand:'Ілюстративне фото',source:'Wikimedia Commons',sourceUrl:approvedSource('https://commons.wikimedia.org/wiki/'+encodeURIComponent(entry.pageimage||'')),score:1};
+    }catch{return null;}
   }
   async function searchPhoto(){
     const barcode=$('#f-barcode').value.replace(/\D/g,'');
@@ -1553,35 +1583,34 @@ window.InlineQRCode=req('index');
       if(!photoOptions.length){$('#photo-status').textContent='Фото не знайдено. Можна зберегти без фотографії.';return;}
       $('#photo-results').innerHTML=photoOptions.map((x,n)=>'<button type="button" class="photo-result" data-photo-index="'+n+'"><img src="'+esc(x.imageUrl)+'" loading="lazy" alt=""><strong>'+esc(x.name)+'</strong><small>'+esc(x.brand||'Без бренду')+'</small></button>').join('');
       $('#photo-status').textContent='Знайдено '+photoOptions.length+' фото. Вибери правильну упаковку.';
-      if(photoOptions.length===1&&barcode.length>=8){photoSelection=approvedImage(photoOptions[0].imageUrl);updatePhotoPreview();}
+      if(photoOptions.length===1&&barcode.length>=8){photoSelection=approvedImage(photoOptions[0].imageUrl);photoSourceUrl=approvedSource(photoOptions[0].sourceUrl);updatePhotoPreview();}
     }catch(e){if(rid===photoRequestId)$('#photo-status').textContent=String(e.message||'Не вдалося знайти фото');}
     finally{if(rid===photoRequestId)button.disabled=false;}
   }
   function autoFindPhoto(item){
     if(item.imageUrl)return;
     const barcode=item.barcode||'';
-    if(barcode.length<8&&item.name.trim().split(/\s+/).length<2)return;
     imageLookup(item.name,barcode).then(results=>{
       const first=results.find(x=>approvedImage(x.imageUrl)&&(barcode.length>=8||x.score>=.88));
       if(!first)return;
       const actual=state.items.find(x=>x.id===item.id);
       if(!actual||actual.imageUrl||actual.name!==item.name||actual.barcode!==item.barcode)return;
-      actual.imageUrl=approvedImage(first.imageUrl);save();render();
+      actual.imageUrl=approvedImage(first.imageUrl);actual.imageSourceUrl=approvedSource(first.sourceUrl);save();render();
     }).catch(()=>{});
   }
   $('#find-product-photo').addEventListener('click',searchPhoto);
   $('#remove-product-photo').addEventListener('click',()=>{
-    photoSelection='';photoOptions=[];photoRequestId++;$('#photo-results').innerHTML='';
+    photoSelection='';photoSourceUrl='';photoOptions=[];photoRequestId++;$('#photo-results').innerHTML='';
     $('#photo-status').textContent='Фото прибране. Збережи продукт, щоб застосувати.';
     $('#find-product-photo').disabled=false;updatePhotoPreview();
   });
   $('#photo-results').addEventListener('click',e=>{
     const b=e.target.closest('[data-photo-index]');if(!b)return;
     const item=photoOptions[Number(b.dataset.photoIndex)];
-    if(!item)return;photoSelection=approvedImage(item.imageUrl);updatePhotoPreview();
+    if(!item)return;photoSelection=approvedImage(item.imageUrl);photoSourceUrl=approvedSource(item.sourceUrl);updatePhotoPreview();
     $('#photo-status').textContent='Обрано: '+item.name+'. Збережи продукт.';
   });
-  function openForm(item){editing=item?.id||null;photoRequestId++;photoOptions=[];photoSelection=approvedImage(item?.imageUrl);updatePhotoPreview();$('#photo-results').innerHTML='';$('#photo-status').textContent=photoSelection?'Фото збережено. Можна замінити.':'Знайди фото за назвою або штрихкодом.';$('#find-product-photo').disabled=false;$('#dialog-title').textContent=item?'Редагувати продукт':'Новий продукт';$('#f-name').value=item?.name||'';$('#f-category').value=item?.category||'dairy';$('#f-qty').value=item?.qty??1;$('#f-unit').value=item?.unit||'шт';$('#f-min').value=item?.min??1;$('#f-target').value=item?.target??3;$('#f-expiry').value=item?.expiry||'';$('#f-price').value=item?.price||'';$('#f-place').value=item?.place||'fridge';$('#f-barcode').value=item?.barcode||'';$('#f-note').value=item?.note||'';$('#form-error').textContent='';$('#delete-product').hidden=!editing;$('#product-dialog').showModal();}
+  function openForm(item){editing=item?.id||null;photoRequestId++;photoOptions=[];photoSelection=approvedImage(item?.imageUrl);photoSourceUrl=approvedSource(item?.imageSourceUrl);updatePhotoPreview();$('#photo-results').innerHTML='';$('#photo-status').textContent=photoSelection?'Фото збережено. Можна замінити.':'Знайди фото за назвою або штрихкодом.';$('#find-product-photo').disabled=false;$('#dialog-title').textContent=item?'Редагувати продукт':'Новий продукт';$('#f-name').value=item?.name||'';$('#f-category').value=item?.category||'dairy';$('#f-qty').value=item?.qty??1;$('#f-unit').value=item?.unit||'шт';$('#f-min').value=item?.min??1;$('#f-target').value=item?.target??3;$('#f-expiry').value=item?.expiry||'';$('#f-price').value=item?.price||'';$('#f-place').value=item?.place||'fridge';$('#f-barcode').value=item?.barcode||'';$('#f-note').value=item?.note||'';$('#form-error').textContent='';$('#delete-product').hidden=!editing;$('#product-dialog').showModal();}
   function changeQty(item,dir){item.qty=precision(Math.max(0,item.qty+dir*unitStep(item)));logAction(`${dir>0?'+':'−'} ${item.name}: ${fmt(item.qty)} ${item.unit}`);save();render();}
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
   $('#header-qr').addEventListener('click',()=>setTab('qr'));
@@ -1599,7 +1628,7 @@ window.InlineQRCode=req('index');
   $('#search-products').addEventListener('input',renderStock);
   $('#open-add-top').addEventListener('click',()=>openForm());$('#open-add-bottom').addEventListener('click',()=>openForm());
   $('#close-dialog').addEventListener('click',()=>$('#product-dialog').close());$('#product-dialog').addEventListener('click',e=>{if(e.target===$('#product-dialog'))$('#product-dialog').close();});
-  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value,imageUrl:photoSelection});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
+  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value,imageUrl:photoSelection,imageSourceUrl:photoSourceUrl});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
     if(editing){const at=state.items.findIndex(x=>x.id===editing);if(at>=0)state.items[at]=i;}else state.items.unshift(i);logAction(`${editing?'Змінено':'Додано'}: ${i.name}`);save();render();$('#product-dialog').close();showToast(editing?'Зміни збережено':'Продукт додано');if(!i.imageUrl)autoFindPhoto(i);});
   $('#delete-product').addEventListener('click',()=>{if(!editing)return;const i=state.items.find(i=>i.id===editing);if(!i)return;if(!confirm(`Видалити «${i.name}» із холодильника?`))return;state.items=state.items.filter(i=>i.id!==editing);logAction(`Видалено: ${i.name}`);save();render();$('#product-dialog').close();showToast('Продукт видалено');});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const id=b.dataset.id,act=b.dataset.action;if(act==='manualBought'){state.shopping=state.shopping.filter(i=>i.id!==id);save();render();showToast('Покупку викреслено');return;}const i=state.items.find(x=>x.id===id);if(!i)return;if(act==='edit'){openForm(i);return;}if(act==='increase')changeQty(i,1);if(act==='decrease')changeQty(i,-1);if(act==='bought'){i.qty=i.target;logAction(`Куплено: ${i.name}`);save();render();showToast('Запас поповнено');}});
@@ -1742,7 +1771,7 @@ window.InlineQRCode=req('index');
       $('#f-category').value=found?.category||identifyCategory(name);
       $('#f-barcode').value=code;
       const img=approvedImage(p?.image_front_url||p?.image_front_small_url||p?.image_url);
-      if(img&&!found?.imageUrl){photoSelection=img;updatePhotoPreview();}
+      if(img&&!found?.imageUrl){photoSelection=img;photoSourceUrl=approvedSource('https://world.openfoodfacts.org/product/'+code);updatePhotoPreview();}
       showToast(found?'Знайдено в холодильнику':'Товар знайдено — перевір кількість і дату');
     }catch(e){status.textContent='Не вдалося отримати товар: '+(e.message||'помилка')+'. Можна ввести його вручну.';}
   }
