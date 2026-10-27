@@ -1642,7 +1642,7 @@ window.InlineQRCode=req('index');
     const ref=i.priceReference;
     const priceHtml=(i.price>0?'<small class="item-purchase">Ціна з чека: '+euro(i.price)+'</small>':'')+
       (ref?'<small class="item-purchase">Орієнтир: '+euro(ref.amount)+' · '+esc(ref.retailer)+
-      (ref.package?' · '+esc(ref.package):'')+(ref.kind==='historical'?' · історична ціна':' · ціна на сайті')+
+      (ref.package?' · '+esc(ref.package):'')+(ref.deposit>0?' + '+euro(ref.deposit)+' Pfand':'')+(ref.kind==='historical'?' · історична ціна':ref.kind==='external-retailer'?' · інший продавець':' · опублікована ціна')+
       (ref.observedOn?' · '+esc(ref.observedOn):'')+
       ' · <a href="'+esc(ref.sourceUrl)+'" target="_blank" rel="noopener noreferrer">джерело</a></small>':'')+
       (!ref&&i.market?'<small class="item-purchase">Історичне спостереження: '+euro(i.market.price)+' · '+esc(i.market.date)+
