@@ -1532,6 +1532,7 @@ window.InlineQRCode=req('index');
     document.querySelectorAll('.photo-result').forEach((b,n)=>b.classList.toggle('selected',photoOptions[n]?.imageUrl===url));
   }
   async function imageLookup(name,barcode){
+    if(!barcode){const generic=await browserWikiPhoto(name);if(generic)return [generic];}
     const params=new URLSearchParams();
     if(barcode)params.set('barcode',barcode);else params.set('name',name);
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12500);
@@ -1539,6 +1540,7 @@ window.InlineQRCode=req('index');
       const r=await fetch('/api/product-images?'+params,{signal:controller.signal});
       const data=await r.json();
       if(!r.ok)throw Error(data.error||'Помилка пошуку');
+      if(!barcode&&!(data.candidates||[]).length){const generic=await browserWikiPhoto(name);if(generic)return [generic];}
       return data.candidates||[];
     }catch(e){
       if(!barcode){
