@@ -1793,9 +1793,10 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   async function syncRequest(action,extra={}){
     const response=await fetch('/api/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,initData:tg?.initData||'',...extra})});
     let data={};try{data=await response.json();}catch(e){}
-    if(!response.ok){const error=Error(data.error||`Помилка синхронізації ${response.status}`);error.status=response.status;error.data=data;throw error;}
+    if(!response.ok){const error=Error(data.error||`Помилка синхронізації ${response.status}`);error.status=response.status;error.code=data.code||'';error.data=data;throw error;}
     return data;
   }
+  function syncErrorText(error){const detail=error.code?` (${error.code})`:error.status?` (HTTP ${error.status})`:'';return `${error.message||'Синхронізація тимчасово недоступна.'}${detail}`;}
   function mergeStates(leftRaw,rightRaw){
     const left=normalize(leftRaw),right=normalize(rightRaw),keys=['items','shopping','receipts','events'];
     const deleted={};
@@ -1847,7 +1848,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
       if(needsPush)await pushCloudState();
       setSyncStatus('Запаси синхронізуються з @DeltaYrk та @yuliayans.');
       if(showNotice)showToast('Спільні запаси оновлено');
-    }catch(error){setSyncStatus(error.message||'Синхронізація тимчасово недоступна.',true);if(showNotice)showToast('Не вдалося синхронізувати');}
+    }catch(error){setSyncStatus(`${syncErrorText(error)} Дані збережені локально; повторю спробу при поверненні до застосунку або мережі.`,true);if(showNotice)showToast('Не вдалося синхронізувати');}
     finally{syncInProgress=false;if(syncQueued){syncQueued=false;queueCloudSave();}}
   }
   $('#sync-now').addEventListener('click',()=>syncNow(true));
@@ -1859,8 +1860,10 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     finally{button.disabled=false;}
   });
   if(tg?.initData){$('#sync-now').disabled=false;$('#notifications-toggle').disabled=false;}else{$('#sync-now').disabled=true;$('#notifications-toggle').disabled=true;}
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&syncReady)syncNow(false);});
-  window.addEventListener('focus',()=>{if(syncReady)syncNow(false);});
+  const retryCloudSync=()=>{if(tg?.initData)syncNow(false);};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')retryCloudSync();});
+  window.addEventListener('focus',retryCloudSync);
+  window.addEventListener('online',retryCloudSync);
 
   $('#filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;filter=b.dataset.filter;renderStock();});
   $('#search-products').addEventListener('input',renderStock);
@@ -2459,9 +2462,9 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
       const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),26000);
       let response;try{response=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData,question:q,items:state.items.filter(x=>x.qty>0).slice(0,80).map(x=>({name:x.name,qty:x.qty,unit:x.unit,expiry:x.expiry}))}),signal:controller.signal});}finally{clearTimeout(timeout);}
       const data=await response.json();
-      if(!response.ok)throw Error(data.error||`Помилка API ${response.status}`);
+      if(!response.ok){const error=Error(data.error||`Помилка API ${response.status}`);error.status=response.status;error.code=data.code||'';throw error;}
       el.textContent=data.answer||'Немає відповіді';
-    }catch(e){el.textContent='ШІ недоступний: '+(e.message||'помилка')+'. Спробуй локальні рецепти вище.';}
+    }catch(e){const detail=e.code?` (${e.code})`:e.status?` (HTTP ${e.status})`:'';el.textContent='ШІ недоступний: '+(e.message||'помилка')+detail+'. Спробуй локальні рецепти вище.';}
     finally{btn.disabled=false;}
   });
 
