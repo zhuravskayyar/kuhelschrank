@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "npx serve . -l 3000",
-    "check": "node --check api/ai.js"
+    "check": "node --check api/ai.js && node --check api/sync.js && node --check api/notifications.js && node --check api/telegram.js && node --check lib/telegram-auth.js && node --check lib/shared-store.js"
   }
 }

@@ -1,32 +1,6 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { isAllowedTelegramUser, verifyTelegramInitData } from '../lib/telegram-auth.js';
 
-const MAX_AGE_SECONDS = 86400;
 const recentRequests = new Map(); // Best-effort only; not durable across serverless instances.
-
-function verifyTelegram(initData, token) {
-  if (typeof initData !== 'string' || initData.length < 1 || initData.length > 10000) return null;
-  const params = new URLSearchParams(initData);
-  const hash = params.get('hash');
-  const authDate = Number(params.get('auth_date'));
-  if (!hash || !/^[a-f0-9]{64}$/i.test(hash) || !Number.isFinite(authDate)) return null;
-  const now = Math.floor(Date.now() / 1000);
-  if (authDate > now + 60 || now - authDate > MAX_AGE_SECONDS) return null;
-  params.delete('hash');
-  params.delete('signature');
-  const checkString = [...params.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([k, v]) => k + '=' + v).join('\n');
-  const secret = createHmac('sha256', 'WebAppData').update(token).digest();
-  const expected = createHmac('sha256', secret).update(checkString).digest();
-  const supplied = Buffer.from(hash, 'hex');
-  if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) return null;
-  try {
-    const user = JSON.parse(params.get('user') || '{}');
-    return Number.isSafeInteger(user?.id) ? user : null;
-  } catch {
-    return null;
-  }
-}
 
 function refuse(res, status, message) {
   return res.status(status).json({ error: message });
@@ -38,7 +12,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return refuse(res, 405, 'Потрібен POST-запит');
 
   const { NVIDIA_API_KEY, NVIDIA_MODEL, TELEGRAM_BOT_TOKEN, ALLOWED_TELEGRAM_IDS } = process.env;
-  if (!NVIDIA_API_KEY || !NVIDIA_MODEL || !TELEGRAM_BOT_TOKEN || !ALLOWED_TELEGRAM_IDS) {
+  if (!NVIDIA_API_KEY || !NVIDIA_MODEL || !TELEGRAM_BOT_TOKEN || (!ALLOWED_TELEGRAM_IDS && !process.env.ALLOWED_TELEGRAM_USERNAMES)) {
     return refuse(res, 503, 'NVIDIA не налаштована. Локальні рецепти продовжують працювати.');
   }
   let body;
@@ -48,10 +22,9 @@ export default async function handler(req, res) {
     return refuse(res, 413, 'Завеликий запит');
   }
 
-  const user = verifyTelegram(body.initData, TELEGRAM_BOT_TOKEN);
+  const user = verifyTelegramInitData(body.initData, TELEGRAM_BOT_TOKEN);
   if (!user) return refuse(res, 401, 'Потрібен дійсний Telegram Mini App вхід');
-  const allowed = ALLOWED_TELEGRAM_IDS.split(',').map(x => x.trim()).filter(Boolean);
-  if (!allowed.includes(String(user.id))) return refuse(res, 403, 'Цей акаунт не має доступу до NVIDIA');
+  if (!isAllowedTelegramUser(user)) return refuse(res, 403, 'Цей акаунт не має доступу до NVIDIA');
 
   const question = typeof body.question === 'string' ? body.question.trim().slice(0, 450) : '';
   if (question.length < 3) return refuse(res, 400, 'Напиши запитання');
