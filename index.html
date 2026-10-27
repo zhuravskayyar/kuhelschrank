@@ -1492,15 +1492,25 @@ window.InlineQRCode=req('index');
   function low(i){return i.qty<=i.min && i.target>i.qty;}
   function restock(){return state.items.filter(low);}
   function emoji(i){const s=i.name.toLowerCase();if(/яйц/.test(s))return '🥚';if(/помід|томат/.test(s))return '🍅';if(/огір/.test(s))return '🥒';if(/сир/.test(s))return '🧀';if(/йогурт/.test(s))return '🥣';if(/масло|маслo/.test(s))return '🧈';if(/молок/.test(s))return '🥛';if(/кур|філе/.test(s))return '🍗';if(/яблук/.test(s))return '🍎';if(/банан/.test(s))return '🍌';if(/хліб|батон/.test(s))return '🍞';return CATS[i.category].emoji;}
+
+  function productPicture(i){
+    const url=approvedImage(i.imageUrl),fallback=esc(emoji(i));
+    return '<span class="food-icon '+esc(i.category)+'">'+(url?'<img class="product-photo" src="'+esc(url)+'" alt="" loading="lazy" decoding="async"><span class="photo-fallback" hidden>'+fallback+'</span>':'<span class="photo-fallback">'+fallback+'</span>')+'</span>';
+  }
+  document.addEventListener('error',ev=>{
+    if(ev.target instanceof HTMLImageElement&&ev.target.classList.contains('product-photo')){
+      ev.target.hidden=true;const f=ev.target.nextElementSibling;if(f)f.hidden=false;
+    }
+  },true);
   function productMarkup(i){const e=expirationText(i);const badge=i.qty===0?['Закінчилося','danger']:low(i)?['Потрібно докупити','warn']:e?.length&&daysLeft(i.expiry)<=3?e:null;
-    return `<article class="item"><div class="food-icon ${i.category}" aria-hidden="true">${emoji(i)}</div><div class="item-copy"><button class="item-name" data-action="edit" data-id="${esc(i.id)}" title="Редагувати">${esc(i.name)}</button><div class="item-sub">${esc(CATS[i.category].label)}${i.expiry?'<span class="dot"></span>'+esc(e[0]):''}</div>${badge?`<span class="status ${badge[1]}">${esc(badge[0])}</span>`:''}</div><div class="quantity"><button type="button" data-action="decrease" data-id="${esc(i.id)}" aria-label="Зменшити ${esc(i.name)}" ${i.qty<=0?'disabled':''}>−</button><span class="quantity-val">${fmt(i.qty)}<small>${esc(i.unit)}</small></span><button class="plus" type="button" data-action="increase" data-id="${esc(i.id)}" aria-label="Збільшити ${esc(i.name)}">+</button></div></article>`;
+    return `<article class="item">${productPicture(i)}<div class="item-copy"><button class="item-name" data-action="edit" data-id="${esc(i.id)}" title="Редагувати">${esc(i.name)}</button><div class="item-sub">${esc(CATS[i.category].label)}${i.expiry?'<span class="dot"></span>'+esc(e[0]):''}</div>${badge?`<span class="status ${badge[1]}">${esc(badge[0])}</span>`:''}</div><div class="quantity"><button type="button" data-action="decrease" data-id="${esc(i.id)}" aria-label="Зменшити ${esc(i.name)}" ${i.qty<=0?'disabled':''}>−</button><span class="quantity-val">${fmt(i.qty)}<small>${esc(i.unit)}</small></span><button class="plus" type="button" data-action="increase" data-id="${esc(i.id)}" aria-label="Збільшити ${esc(i.name)}">+</button></div></article>`;
   }
   function renderStock(){let items=state.items.filter(i=>(filter==='all'||i.category===filter)&&i.name.toLowerCase().includes($('#search-products').value.trim().toLowerCase()));items.sort((a,b)=>Number(low(b))-Number(low(a)) || Number(a.qty===0)-Number(b.qty===0) || a.name.localeCompare(b.name,'uk'));
     $('#stock-list').innerHTML=items.length?items.map(productMarkup).join(''):`<div class="empty"><div class="empty-illustration">🥬</div><b>Тут поки порожньо</b><p>${state.items.length?'За цим пошуком продуктів немає.':'Додай свій перший продукт — і починай вести запаси.'}</p></div>`;
     document.querySelectorAll('[data-folder-count]').forEach(e=>{const cat=e.dataset.folderCount;e.textContent=state.items.filter(i=>cat==='all'||i.category===cat).length;});document.querySelectorAll('[data-folder]').forEach(b=>{const selected=b.dataset.folder===filter;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});$('#inventory-label').textContent='· '+(filter==='all'?'усі':CATS[filter].label.toLowerCase());$('#hero-count').textContent=state.items.filter(i=>i.qty>0).length;$('#hero-unit').textContent=`із ${state.items.length} найменувань у списку`;$('#hero-need').textContent=restock().length;$('#hero-expiry').textContent=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=3).length;
     [...$('#filters').children].forEach(b=>{b.classList.toggle('active',b.dataset.filter===filter);b.setAttribute('aria-pressed',b.dataset.filter===filter?'true':'false');});
   }
-  function shoppingMarkupAuto(i){const need=precision(i.target-i.qty);return `<article class="buy-item"><button class="buy-check" type="button" data-action="bought" data-id="${esc(i.id)}" aria-label="Куплено: ${esc(i.name)}">✓</button><span class="buy-icon">${emoji(i)}</span><div class="buy-info"><b>${esc(i.name)}</b><p>Є: ${fmt(i.qty)} ${esc(i.unit)}</p></div><span class="pill">+${fmt(need)} ${esc(i.unit)}</span></article>`;}
+  function shoppingMarkupAuto(i){const need=precision(i.target-i.qty);return `<article class="buy-item"><button class="buy-check" type="button" data-action="bought" data-id="${esc(i.id)}" aria-label="Куплено: ${esc(i.name)}">✓</button>${productPicture(i)}<div class="buy-info"><b>${esc(i.name)}</b><p>Є: ${fmt(i.qty)} ${esc(i.unit)}</p></div><span class="pill">+${fmt(need)} ${esc(i.unit)}</span></article>`;}
   function shoppingMarkupManual(i){return `<article class="buy-item"><button class="buy-check" type="button" data-action="manualBought" data-id="${esc(i.id)}" aria-label="Прибрати зі списку: ${esc(i.name)}">✓</button><div class="buy-info"><b>${esc(i.name)}</b><p>Додано вручну</p></div><span class="pill note">У списку</span></article>`;}
   function renderShopping(){const automatic=restock(), manual=state.shopping;const count=automatic.length+manual.length;$('#shopping-total').textContent=count;$('#nav-count').textContent=count>99?'99+':count;$('#nav-count').hidden=count===0;
     $('#auto-shopping').innerHTML=automatic.length?automatic.map(shoppingMarkupAuto).join(''):`<div class="empty"><div class="empty-illustration">✓</div><b>Запасів достатньо</b><p>Автоматичний список поки порожній.</p></div>`;
@@ -1508,11 +1518,70 @@ window.InlineQRCode=req('index');
   }
   function renderPlan(){const items=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=7).sort((a,b)=>daysLeft(a.expiry)-daysLeft(b.expiry));
     $('#expiry-list').innerHTML=items.length?items.map(i=>{const d=daysLeft(i.expiry),dt=new Date(i.expiry+'T00:00:00');return `<article class="expiry-card ${d<=3?'urgent':''}"><div class="expiry-date"><b>${dt.getDate()}</b><small>${dt.toLocaleDateString('uk-UA',{month:'short'})}</small></div><div class="expiry-detail"><b>${esc(i.name)}</b><p>${d<0?'Термін уже минув':d===0?'Останній день':d===1?'Залишився 1 день':`Залишилося ${d} днів`} · ${fmt(i.qty)} ${esc(i.unit)}</p></div><span>${d<=1?'⚠️':'🍃'}</span></article>`;}).join(''):`<div class="empty"><div class="empty-illustration">🌿</div><b>Нічого термінового</b><p>Немає продуктів із зазначеним терміном, що спливає за 7 днів.</p></div>`;
-    const unknown=state.items.filter(i=>i.qty>0&&!i.expiry);$('#no-expiry-list').innerHTML=unknown.length?unknown.map(i=>`<article class="buy-item"><span class="buy-icon">${emoji(i)}</span><div class="buy-info"><b>${esc(i.name)}</b><p>${fmt(i.qty)} ${esc(i.unit)} · дата не вказана</p></div><button type="button" class="text-btn" data-action="edit" data-id="${esc(i.id)}">Додати дату</button></article>`).join(''):`<p class="notice">У всіх наявних продуктів зазначено дату або список порожній.</p>`;
+    const unknown=state.items.filter(i=>i.qty>0&&!i.expiry);$('#no-expiry-list').innerHTML=unknown.length?unknown.map(i=>`<article class="buy-item">${productPicture(i)}<div class="buy-info"><b>${esc(i.name)}</b><p>${fmt(i.qty)} ${esc(i.unit)} · дата не вказана</p></div><button type="button" class="text-btn" data-action="edit" data-id="${esc(i.id)}">Додати дату</button></article>`).join(''):`<p class="notice">У всіх наявних продуктів зазначено дату або список порожній.</p>`;
   }
   function render(){renderStock();renderShopping();renderPlan();renderSmart();}
   function setTab(name){if(!['stock','shopping','plan','smart','qr'].includes(name))return;tab=name;document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='screen-'+tab));document.querySelectorAll('[data-tab]').forEach(b=>{const yes=b.dataset.tab===tab;b.classList.toggle('active',yes);b.setAttribute('aria-current',yes?'page':'false');});window.scrollTo({top:0,behavior:'instant'});}
-  function openForm(item){editing=item?.id||null;$('#dialog-title').textContent=item?'Редагувати продукт':'Новий продукт';$('#f-name').value=item?.name||'';$('#f-category').value=item?.category||'dairy';$('#f-qty').value=item?.qty??1;$('#f-unit').value=item?.unit||'шт';$('#f-min').value=item?.min??1;$('#f-target').value=item?.target??3;$('#f-expiry').value=item?.expiry||'';$('#f-price').value=item?.price||'';$('#f-place').value=item?.place||'fridge';$('#f-barcode').value=item?.barcode||'';$('#f-note').value=item?.note||'';$('#form-error').textContent='';$('#delete-product').hidden=!editing;$('#product-dialog').showModal();}
+
+  let photoSelection='',photoOptions=[],photoRequestId=0;
+  function updatePhotoPreview(){
+    const url=approvedImage(photoSelection);
+    $('#photo-preview').innerHTML=url?'<img src="'+esc(url)+'" alt="Обране фото товару">':'<span>Без фото</span>';
+    document.querySelectorAll('.photo-result').forEach((b,n)=>b.classList.toggle('selected',photoOptions[n]?.imageUrl===url));
+  }
+  async function imageLookup(name,barcode){
+    const params=new URLSearchParams();
+    if(barcode)params.set('barcode',barcode);else params.set('name',name);
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12500);
+    try{
+      const r=await fetch('/api/product-images?'+params,{signal:controller.signal});
+      const data=await r.json();
+      if(!r.ok)throw Error(data.error||'Помилка пошуку');
+      return data.candidates||[];
+    }finally{clearTimeout(timer);}
+  }
+  async function searchPhoto(){
+    const barcode=$('#f-barcode').value.replace(/\D/g,'');
+    const name=$('#f-name').value.trim();
+    if(barcode.length<8&&name.length<3){$('#photo-status').textContent='Введи назву або штрихкод продукту.';return;}
+    const rid=++photoRequestId,button=$('#find-product-photo');
+    button.disabled=true;$('#photo-status').textContent='Шукаю реальні фотографії…';$('#photo-results').innerHTML='';
+    try{
+      const results=await imageLookup(name,barcode.length>=8?barcode:'');
+      if(rid!==photoRequestId)return;
+      photoOptions=results.filter(x=>approvedImage(x.imageUrl));
+      if(!photoOptions.length){$('#photo-status').textContent='Фото не знайдено. Можна зберегти без фотографії.';return;}
+      $('#photo-results').innerHTML=photoOptions.map((x,n)=>'<button type="button" class="photo-result" data-photo-index="'+n+'"><img src="'+esc(x.imageUrl)+'" loading="lazy" alt=""><strong>'+esc(x.name)+'</strong><small>'+esc(x.brand||'Без бренду')+'</small></button>').join('');
+      $('#photo-status').textContent='Знайдено '+photoOptions.length+' фото. Вибери правильну упаковку.';
+      if(photoOptions.length===1&&barcode.length>=8){photoSelection=approvedImage(photoOptions[0].imageUrl);updatePhotoPreview();}
+    }catch(e){if(rid===photoRequestId)$('#photo-status').textContent=String(e.message||'Не вдалося знайти фото');}
+    finally{if(rid===photoRequestId)button.disabled=false;}
+  }
+  function autoFindPhoto(item){
+    if(item.imageUrl)return;
+    const barcode=item.barcode||'';
+    if(barcode.length<8&&item.name.trim().split(/\s+/).length<2)return;
+    imageLookup(item.name,barcode).then(results=>{
+      const first=results.find(x=>approvedImage(x.imageUrl)&&(barcode.length>=8||x.score>=.88));
+      if(!first)return;
+      const actual=state.items.find(x=>x.id===item.id);
+      if(!actual||actual.imageUrl||actual.name!==item.name||actual.barcode!==item.barcode)return;
+      actual.imageUrl=approvedImage(first.imageUrl);save();render();
+    }).catch(()=>{});
+  }
+  $('#find-product-photo').addEventListener('click',searchPhoto);
+  $('#remove-product-photo').addEventListener('click',()=>{
+    photoSelection='';photoOptions=[];photoRequestId++;$('#photo-results').innerHTML='';
+    $('#photo-status').textContent='Фото прибране. Збережи продукт, щоб застосувати.';
+    $('#find-product-photo').disabled=false;updatePhotoPreview();
+  });
+  $('#photo-results').addEventListener('click',e=>{
+    const b=e.target.closest('[data-photo-index]');if(!b)return;
+    const item=photoOptions[Number(b.dataset.photoIndex)];
+    if(!item)return;photoSelection=approvedImage(item.imageUrl);updatePhotoPreview();
+    $('#photo-status').textContent='Обрано: '+item.name+'. Збережи продукт.';
+  });
+  function openForm(item){editing=item?.id||null;photoRequestId++;photoOptions=[];photoSelection=approvedImage(item?.imageUrl);updatePhotoPreview();$('#photo-results').innerHTML='';$('#photo-status').textContent=photoSelection?'Фото збережено. Можна замінити.':'Знайди фото за назвою або штрихкодом.';$('#find-product-photo').disabled=false;$('#dialog-title').textContent=item?'Редагувати продукт':'Новий продукт';$('#f-name').value=item?.name||'';$('#f-category').value=item?.category||'dairy';$('#f-qty').value=item?.qty??1;$('#f-unit').value=item?.unit||'шт';$('#f-min').value=item?.min??1;$('#f-target').value=item?.target??3;$('#f-expiry').value=item?.expiry||'';$('#f-price').value=item?.price||'';$('#f-place').value=item?.place||'fridge';$('#f-barcode').value=item?.barcode||'';$('#f-note').value=item?.note||'';$('#form-error').textContent='';$('#delete-product').hidden=!editing;$('#product-dialog').showModal();}
   function changeQty(item,dir){item.qty=precision(Math.max(0,item.qty+dir*unitStep(item)));logAction(`${dir>0?'+':'−'} ${item.name}: ${fmt(item.qty)} ${item.unit}`);save();render();}
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
   $('#header-qr').addEventListener('click',()=>setTab('qr'));
@@ -1530,8 +1599,8 @@ window.InlineQRCode=req('index');
   $('#search-products').addEventListener('input',renderStock);
   $('#open-add-top').addEventListener('click',()=>openForm());$('#open-add-bottom').addEventListener('click',()=>openForm());
   $('#close-dialog').addEventListener('click',()=>$('#product-dialog').close());$('#product-dialog').addEventListener('click',e=>{if(e.target===$('#product-dialog'))$('#product-dialog').close();});
-  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
-    if(editing){const at=state.items.findIndex(x=>x.id===editing);if(at>=0)state.items[at]=i;}else state.items.unshift(i);logAction(`${editing?'Змінено':'Додано'}: ${i.name}`);save();render();$('#product-dialog').close();showToast(editing?'Зміни збережено':'Продукт додано');});
+  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value,imageUrl:photoSelection});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
+    if(editing){const at=state.items.findIndex(x=>x.id===editing);if(at>=0)state.items[at]=i;}else state.items.unshift(i);logAction(`${editing?'Змінено':'Додано'}: ${i.name}`);save();render();$('#product-dialog').close();showToast(editing?'Зміни збережено':'Продукт додано');if(!i.imageUrl)autoFindPhoto(i);});
   $('#delete-product').addEventListener('click',()=>{if(!editing)return;const i=state.items.find(i=>i.id===editing);if(!i)return;if(!confirm(`Видалити «${i.name}» із холодильника?`))return;state.items=state.items.filter(i=>i.id!==editing);logAction(`Видалено: ${i.name}`);save();render();$('#product-dialog').close();showToast('Продукт видалено');});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const id=b.dataset.id,act=b.dataset.action;if(act==='manualBought'){state.shopping=state.shopping.filter(i=>i.id!==id);save();render();showToast('Покупку викреслено');return;}const i=state.items.find(x=>x.id===id);if(!i)return;if(act==='edit'){openForm(i);return;}if(act==='increase')changeQty(i,1);if(act==='decrease')changeQty(i,-1);if(act==='bought'){i.qty=i.target;logAction(`Куплено: ${i.name}`);save();render();showToast('Запас поповнено');}});
   $('#shopping-form').addEventListener('submit',e=>{e.preventDefault();const f=e.currentTarget;const name=f.elements.shoppingName.value.trim();if(!name)return;state.shopping.push({id:uid(),name:name.slice(0,65)});save();render();f.reset();showToast('Додано до покупок');});
@@ -1663,7 +1732,7 @@ window.InlineQRCode=req('index');
     try{
       const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),9000);
       let result;try{
-        const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_uk,product_name_de,brands,quantity,categories_tags`,{signal:controller.signal});
+        const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_uk,product_name_de,brands,quantity,categories_tags,image_front_url,image_front_small_url,image_url`,{signal:controller.signal});
         if(!r.ok)throw Error('Сервіс тимчасово недоступний');result=await r.json();
       }finally{clearTimeout(timeout);}
       const p=result.product;const name=p&&(p.product_name_uk||p.product_name_de||p.product_name);
@@ -1672,6 +1741,8 @@ window.InlineQRCode=req('index');
       closeScan();openForm(found||null);$('#f-name').value=found?.name||name.slice(0,65);
       $('#f-category').value=found?.category||identifyCategory(name);
       $('#f-barcode').value=code;
+      const img=approvedImage(p?.image_front_url||p?.image_front_small_url||p?.image_url);
+      if(img&&!found?.imageUrl){photoSelection=img;updatePhotoPreview();}
       showToast(found?'Знайдено в холодильнику':'Товар знайдено — перевір кількість і дату');
     }catch(e){status.textContent='Не вдалося отримати товар: '+(e.message||'помилка')+'. Можна ввести його вручну.';}
   }
