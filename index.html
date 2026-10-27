@@ -2115,9 +2115,243 @@ window.InlineQRCode=req('index');
     logAction('Чек'+(store?' '+SHOP_NAMES[store]:'')+': '+selected.length+' товарів · '+euro(total));
     save();render();closeScan();showToast('Додано '+selected.length+' позицій. Звір назви, кількість і ціну за одиницю.');
   }
+
+  // Searchable recipe catalogue. We match quantities locally; personal inventory never goes to public recipe search.
+  const recipeVocabulary=[
+    [/томатна паста|tomatenmark/iu,'томатна паста'],
+    [/квашен.*капуст|sauerkraut/iu,'квашена капуста'],
+    [/солон.*огір|essiggurk|gewürzgurk/iu,'солоні огірки'],
+    [/масло вершкове|butter(?!milch)/iu,'масло вершкове'],
+    [/куряч.*філе|hähnchenbrust|huhn.*brust|chicken breast/iu,'куряче філе'],
+    [/куряч.*фарш|hähnchenhack/iu,'курячий фарш'],
+    [/борошн|^mehl|^weizenmehl/iu,'борошно'],
+    [/буряк|буряч|rote bete|rote beete|rote rübe/iu,'буряк'],
+    [/капуст|weisskohl|weißkohl|white cabbage/iu,'капуста'],
+    [/картопл|kartoffel|картоф/iu,'картопля'],
+    [/моркв|моркв|karotte|möhren|möhre|carrot/iu,'морква'],
+    [/цибул.*червон|rote zwiebel/iu,'цибуля червона'],
+    [/цибул|zwiebel|onion/iu,'цибуля'],
+    [/яловичин|rindfleisch|beef/iu,'яловичина'],
+    [/помідор|томат(?!на паста)|tomaten|tomato/iu,'помідори'],
+    [/огірк|gurken|gurke|cucumber/iu,'огірки'],
+    [/сметан|schmand|saure sahne|sour cream/iu,'сметана'],
+    [/яйц|яйце|eier|^ei$|eggs|egg/iu,'яйця'],
+    [/молок|^milch|^milk$/iu,'молоко'],
+    [/вершк|sahne|cream/iu,'вершки'],
+    [/сир тверд|hartkäse|schnittkäse/iu,'твердий сир'],
+    [/йогурт|joghurt|yogurt|yoghurt/iu,'йогурт'],
+    [/фарш|hackfleisch|mince/iu,'фарш'],
+    [/свинин|schweinefleisch|pork/iu,'свинина'],
+    [/курк|hähnchen|huhn|chicken/iu,'курка'],
+    [/маслин|оливк|oliven|olive/iu,'маслини'],
+    [/олія|sonnenblumenöl|pflanzenöl|vegetable oil/iu,'олія'],
+    [/рис|^reis$|^rice$/iu,'рис'],
+    [/квасол|bohnen|beans/iu,'квасоля'],
+    [/часник|knoblauch|garlic/iu,'часник'],
+    [/гречк|buchweizen|buckwheat/iu,'гречка'],
+    [/хліб|^brot$|^bread$/iu,'хліб'],
+    [/цукор|zucker|sugar/iu,'цукор'],
+    [/риба|fisch|fish/iu,'риба'],
+    [/лимон|zitrone|lemon/iu,'лимон'],
+    [/оливков.*олія|olivenöl/iu,'оливкова олія']
+  ];
+  function recipeFoodKey(value){
+    const s=String(value||'').normalize('NFKC').toLocaleLowerCase('uk').replace(/[^\p{L}\s]/gu,' ').replace(/\s+/g,' ').trim();
+    for(const [rx,key] of recipeVocabulary)if(rx.test(s))return key;
+    return s;
+  }
+  function baseRecipeUnit(q,unit){
+    const n=Number(q);if(!Number.isFinite(n)||n<0)return null;
+    if(unit==='г')return {group:'mass',n};
+    if(unit==='кг')return {group:'mass',n:n*1000};
+    if(unit==='мл')return {group:'volume',n};
+    if(unit==='л')return {group:'volume',n:n*1000};
+    if(unit==='шт')return {group:'pieces',n};
+    return null;
+  }
+  function recipeAmount(q,u){
+    if(q===null||q===undefined||!Number.isFinite(Number(q)))return '';
+    const v=u==='шт'?Math.ceil(Number(q)):Math.round(Number(q)*100)/100;
+    return fmt(v)+' '+u;
+  }
+  function recipeRowsFor(recipe,servings){
+    const defaultCount=Number(recipe.servings)||4,scale=Number(recipe.servings)?servings/defaultCount:1;
+    return (recipe.ingredients||[]).map(ing=>{
+      const q=Number.isFinite(Number(ing.quantity))&&ing.quantity!==null?Number(ing.quantity)*scale:null;
+      const req=baseRecipeUnit(q,ing.unit);
+      const matching=state.items.filter(i=>i.qty>0&&(!i.expiry||daysLeft(i.expiry)>=0)&&recipeFoodKey(i.name)===recipeFoodKey(ing.name));
+      let enough=false,uncertain=false,missing=q,have=0;
+      if(recipeFoodKey(ing.name)==='вода'){enough=true;missing=0;}
+      else if(req){
+        let hasUncounted=false;
+        for(const stock of matching){
+          const m=baseRecipeUnit(stock.qty,stock.unit);
+          if(m&&m.group===req.group)have+=m.n;
+          else hasUncounted=true;
+        }
+        missing=Math.max(0,req.n-have);
+        // express missing in the requested unit, not base units
+        const factor=req.n&&q?req.n/q:1;
+        missing=Math.max(0,missing/(factor||1));
+        enough=missing<0.0001;
+        uncertain=!enough&&hasUncounted;
+      }else{
+        enough=matching.length>0;
+        uncertain=enough;
+        missing=enough?0:null;
+      }
+      let latestPrice=null;
+      const prior=state.items.filter(i=>recipeFoodKey(i.name)===recipeFoodKey(ing.name)&&Number(i.price)>0);
+      for(const p of prior){
+        const unit=baseRecipeUnit(1,p.unit),need=baseRecipeUnit(missing,ing.unit);
+        if(need&&unit&&need.group===unit.group){
+          latestPrice={price:Math.round(Number(p.price)*need.n/unit.n*100)/100,source:'Моя остання ціна',item:p};
+          break;
+        }
+      }
+      const observed=matching.map(x=>x.market).find(x=>x&&x.price>0);
+      return {ingredient:ing,quantity:q,unit:ing.unit||'',missing,
+        enough,uncertain,matching,latestPrice,observed};
+    });
+  }
+  let catalogRecipes=[],catalogQuery='',catalogCategory='all',catalogRequestSeq=0,
+    catalogTimer=null,selectedCatalogRecipe=null,catalogCache=new Map();
+  function renderCatalogList(){
+    const mount=$('#catalog-results');
+    if(!mount)return;
+    if(!catalogRecipes.length){mount.innerHTML='<p class="smart-caption">Рецептів за запитом не знайдено. Спробуй іншу назву.</p>';return;}
+    mount.innerHTML=catalogRecipes.map((r,i)=>{
+      const rows=recipeRowsFor(r,Number(r.servings)||4);
+      const covered=rows.filter(x=>x.enough).length;
+      const missing=rows.filter(x=>!x.enough&&!x.uncertain).length;
+      return '<button type="button" class="catalog-result" data-catalog-index="'+i+'"><span><b>'+esc(r.name_uk)+'</b><small>'+
+      esc(r.category)+' · '+(r.minutes?esc(r.minutes)+' хв · ':'')+rows.length+' інгредієнтів'+
+      (r.origin==='TheMealDB'?' · англійською':'')+'</small></span>'+
+      '<span class="recipe-score '+(missing?'missing':'')+'">Вдома '+covered+'/'+rows.length+'</span></button>';
+    }).join('');
+  }
+  async function loadRecipeCatalog(query='',category='all'){
+    catalogQuery=String(query||'').trim().slice(0,65);catalogCategory=category;
+    const sequence=++catalogRequestSeq, key=category+'|'+catalogQuery.toLocaleLowerCase('uk');
+    $('#catalog-recipe-query').value=catalogQuery;
+    document.querySelectorAll('[data-recipe-category]').forEach(b=>b.classList.toggle('active',b.dataset.recipeCategory===category));
+    if(catalogCache.has(key)){
+      catalogRecipes=catalogCache.get(key);renderCatalogList();
+      $('#catalog-status').textContent='Рецептів знайдено: '+catalogRecipes.length+'.';
+      return;
+    }
+    $('#catalog-status').textContent='Шукаємо рецепти…';
+    try{
+      const params=new URLSearchParams({q:catalogQuery,limit:'40'});
+      if(category!=='all')params.set('category',category);
+      const response=await fetch('/api/recipe-search?'+params);
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error||'Помилка каталогу');
+      if(sequence!==catalogRequestSeq)return;
+      catalogRecipes=Array.isArray(data.recipes)?data.recipes:[];
+      catalogCache.set(key,catalogRecipes);
+      if(catalogCache.size>55)catalogCache.delete(catalogCache.keys().next().value);
+      $('#catalog-status').textContent='Знайдено рецептів: '+catalogRecipes.length+
+        (data.source==='TheMealDB'?' · зовнішні рецепти (англійською).':'.');
+      renderCatalogList();
+    }catch(e){
+      if(sequence===catalogRequestSeq){
+        catalogRecipes=[];$('#catalog-status').textContent=e.message||'Каталог недоступний';
+        $('#catalog-results').innerHTML='<p class="smart-caption">Не вдалося завантажити рецепти. Перевір з’єднання та спробуй ще раз.</p>';
+      }
+    }
+  }
+  function selectedRecipeServings(){return Number($('#recipe-servings').value)||4;}
+  function renderRecipeDetail(){
+    const recipe=selectedCatalogRecipe;
+    if(!recipe)return;
+    const servings=selectedRecipeServings(),rows=recipeRowsFor(recipe,servings);
+    $('#recipe-detail-title').textContent=recipe.name_uk;
+    $('#recipe-detail-time').textContent=recipe.minutes?recipe.minutes+' хв':'';
+    $('#recipe-detail-hint').textContent=recipe.servings?
+      'Кількості на '+servings+' порц. · у запасах враховуються тільки не прострочені продукти з сумісними одиницями.':
+      'Кількості залишено як у джерелі: число порцій невідоме.';
+    $('#recipe-servings').disabled=!recipe.servings;
+    $('#recipe-detail-ingredients').innerHTML=rows.map(x=>{
+      const i=x.ingredient,amount=x.quantity!==null?recipeAmount(x.quantity,i.unit):String(i.measure||'');
+      const status=x.enough?'Є вдома':x.uncertain?'Перевір кількість':'Докупити';
+      const detail=x.enough?(recipeFoodKey(i.name)==='вода'?'Звичайна питна вода':status):
+        (x.uncertain?'Є схожий товар, але одиниці не зіставляються':
+        'Не вистачає '+(x.missing===null?amount:recipeAmount(x.missing,i.unit)));
+      const price=x.latestPrice?' · '+euro(x.latestPrice.price)+' за моєю попередньою ціною':'';
+      const sight=x.observed?' · Open Prices: '+euro(x.observed.price)+' ('+esc(x.observed.date)+', ціна упаковки)':'';
+      return '<div class="recipe-ingredient '+(x.enough?'enough':x.uncertain?'unknown':'missing')+'">'+
+        '<span class="flag">'+(x.enough?'✓':x.uncertain?'?':'+')+'</span><div class="ing-copy"><b>'+
+        esc(i.name)+'</b><small>'+esc(detail)+esc(price)+sight+'</small></div><span class="amount">'+
+        esc(amount)+'</span></div>';
+    }).join('');
+    const missing=rows.filter(x=>!x.enough&&!x.uncertain);
+    let sum=0,priced=0;
+    missing.forEach(x=>{if(x.latestPrice){sum+=x.latestPrice.price;priced++}});
+    $('#recipe-detail-cost').textContent=missing.length?
+      (priced?'Орієнтир за твоїми останніми цінами: '+euro(sum)+' за '+priced+' із '+missing.length+' відсутніх позицій. Для решти ціни невідомі.':
+      'Ціну повного кошика поки не порахувати: немає надійних цін усіх відсутніх інгредієнтів.'):
+      'За обліком запасів відсутніх інгредієнтів немає (перевір фактичну наявність).';
+    $('#recipe-add-missing').disabled=missing.length===0;
+    $('#recipe-add-missing').textContent=missing.length?'Додати '+missing.length+' позицій у покупки':'Усе необхідне є';
+    if(recipe.steps?.length){
+      $('#recipe-detail-steps').innerHTML='<div class="recipe-steps"><h3>Як приготувати</h3><ol>'+recipe.steps.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol></div>';
+    }else{
+      $('#recipe-detail-steps').innerHTML='<p class="smart-caption">Для цієї страви зараз записаний перелік інгредієнтів. Детальні кроки ще не перевірені.</p>';
+    }
+    let link='';
+    try{const u=new URL(recipe.sourceUrl);if(u.protocol==='https:')link=u.toString()}catch(e){}
+    $('#recipe-source').innerHTML=recipe.origin==='TheMealDB'?
+      'Дані: <a href="'+esc(link||'https://www.themealdb.com')+'" target="_blank" rel="noopener noreferrer">TheMealDB</a> · перевір кількості та назви':
+      'Авторський базовий склад · «Поличка». Пропорції орієнтовні, перевір на свій смак.';
+  }
+  function openCatalogRecipe(recipe){
+    if(!recipe)return;
+    selectedCatalogRecipe=recipe;
+    $('#recipe-servings').value=String(recipe.servings||4);
+    renderRecipeDetail();
+    $('#recipe-catalog-dialog').showModal();
+  }
+  $('#recipe-catalog-dialog').addEventListener('click',e=>{if(e.target===$('#recipe-catalog-dialog'))$('#recipe-catalog-dialog').close()});
+  $('#close-recipe-detail').addEventListener('click',()=>$('#recipe-catalog-dialog').close());
+  $('#recipe-servings').addEventListener('change',renderRecipeDetail);
+  $('#catalog-results').addEventListener('click',e=>{
+    const b=e.target.closest('[data-catalog-index]');
+    if(!b)return;openCatalogRecipe(catalogRecipes[Number(b.dataset.catalogIndex)]);
+  });
+  $('#recipe-add-missing').addEventListener('click',()=>{
+    if(!selectedCatalogRecipe)return;
+    const rows=recipeRowsFor(selectedCatalogRecipe,selectedRecipeServings()).filter(x=>!x.enough&&!x.uncertain);
+    let added=0;
+    for(const x of rows){
+      const label=x.ingredient.name,am=x.missing===null?String(x.ingredient.measure||''):recipeAmount(x.missing,x.unit);
+      if(state.shopping.some(item=>item.name.toLocaleLowerCase('uk').startsWith(label.toLocaleLowerCase('uk'))))continue;
+      state.shopping.push({id:uid(),name:(label+(am?' — '+am:'')).slice(0,65)});added++;
+    }
+    if(added){save();render();logAction('Рецепт '+selectedCatalogRecipe.name_uk+': '+added+' позицій у покупки');save();render();}
+    $('#recipe-catalog-dialog').close();
+    showToast(added?'Додано '+added+' позицій у покупки':'Ці інгредієнти вже у списку');
+    if(added)setTab('shopping');
+  });
+  $('#catalog-recipe-query').addEventListener('input',e=>{
+    const value=e.target.value;clearTimeout(catalogTimer);
+    catalogTimer=setTimeout(()=>loadRecipeCatalog(value,catalogCategory),260);
+  });
+  $('#catalog-recipe-categories').addEventListener('click',e=>{
+    const b=e.target.closest('[data-recipe-category]');if(!b)return;
+    loadRecipeCatalog($('#catalog-recipe-query').value,b.dataset.recipeCategory);
+  });
+  $('#home-recipe-search').addEventListener('submit',e=>{
+    e.preventDefault();const q=$('#home-recipe-input').value.trim();
+    setTab('smart');
+    loadRecipeCatalog(q,'all');
+    $('#recipe-catalog-anchor').scrollIntoView({behavior:'smooth',block:'start'});
+    $('#catalog-recipe-query').focus({preventScroll:true});
+  });
+
   // Layout event binding.
   [['#home-barcode','barcode'],['#home-receipt','receipt'],['#smart-barcode','barcode'],['#smart-receipt','receipt'],['#smart-expiry','expiry']].forEach(([sel,mode])=>$(sel).addEventListener('click',()=>openScan(mode)));
-  $('#smart-recipes').addEventListener('click',()=>$('#recipes-anchor').scrollIntoView({behavior:'smooth',block:'start'}));
+  $('#smart-recipes').addEventListener('click',()=>$('#recipe-catalog-anchor').scrollIntoView({behavior:'smooth',block:'start'}));
   $('#refresh-recipes').addEventListener('click',()=>{renderRecipes();showToast('Рекомендації оновлено за запасами');});
   $('#close-scan').addEventListener('click',closeScan);$('#scan-dialog').addEventListener('click',e=>{if(e.target===$('#scan-dialog'))closeScan();});
   $('#scan-dialog').addEventListener('close',()=>stopCamera());
@@ -2153,6 +2387,7 @@ window.InlineQRCode=req('index');
   });
 
   save();render();
+  loadRecipeCatalog('', 'all');
   // Automatic on-open check for a small set of products only: no paid cron, no background polling.
   if(state.items.some(i=>/^\d{8,14}$/.test(i.barcode)))refreshMarketPrices(false);
   if(tg?.initData)syncNow(false);
