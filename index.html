@@ -1500,7 +1500,7 @@ window.InlineQRCode=req('index');
     if (!x || typeof x!=='object' || !String(x.name||'').trim()) return null;
     const number=(n,fallback)=>Number.isFinite(Number(n))?Math.max(0,Math.min(100000,Number(n))):fallback;
     const min=number(x.min,0), target=Math.max(number(x.target,1),min,.01);
-    return {imageUrl:approvedImage(x.imageUrl),imageSourceUrl:approvedSource(x.imageSourceUrl),id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120),store:validStore(x.store),purchaseHistory:cleanHistory(x.purchaseHistory),market:cleanMarket(x.market),marketCheckedAt:String(x.marketCheckedAt||'').slice(0,30)};
+    return {imageUrl:approvedImage(x.imageUrl),imageSourceUrl:approvedSource(x.imageSourceUrl),id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120),store:validStore(x.store),purchaseHistory:cleanHistory(x.purchaseHistory),market:cleanMarket(x.market),marketOptions:Array.isArray(x.marketOptions)?x.marketOptions.slice(0,12).map(cleanMarket).filter(Boolean):[],marketCheckedAt:String(x.marketCheckedAt||'').slice(0,30)};
   }
   function normalize(raw){if(!raw||!Array.isArray(raw.items)||!Array.isArray(raw.shopping))throw Error('Неправильний формат');return {version:4,items:raw.items.slice(0,600).map(validateItem).filter(Boolean),shopping:raw.shopping.slice(0,600).filter(i=>i&&String(i.name||'').trim()).map(i=>({id:String(i.id||uid()).slice(0,100),name:String(i.name).trim().slice(0,65)})),receipts:Array.isArray(raw.receipts)?raw.receipts.slice(-100).filter(x=>x&&Number.isFinite(Number(x.total))).map(x=>({id:String(x.id||uid()),date:String(x.date||''),store:validStore(x.store)||detectStore(x.store),total:Math.max(0,Math.min(100000,Number(x.total)))})):[],events:Array.isArray(raw.events)?raw.events.slice(-100).filter(x=>x&&x.text).map(x=>({text:String(x.text).slice(0,150),at:String(x.at).slice(0,40)})):[],settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0))}};}
   const emptyState=()=>({version:4,items:[],shopping:[],settings:{budget:0}});
@@ -1680,7 +1680,10 @@ window.InlineQRCode=req('index');
   $('#search-products').addEventListener('input',renderStock);
   $('#open-add-top').addEventListener('click',()=>openForm());$('#open-add-bottom').addEventListener('click',()=>openForm());
   $('#close-dialog').addEventListener('click',()=>$('#product-dialog').close());$('#product-dialog').addEventListener('click',e=>{if(e.target===$('#product-dialog'))$('#product-dialog').close();});
-  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value,store:$('#f-store').value,purchaseHistory:editing?(state.items.find(x=>x.id===editing)?.purchaseHistory||[]):[],market:editing?(state.items.find(x=>x.id===editing)?.market||null):null,marketCheckedAt:editing?(state.items.find(x=>x.id===editing)?.marketCheckedAt||''):'',imageUrl:photoSelection,imageSourceUrl:photoSourceUrl});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
+  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value,store:$('#f-store').value,purchaseHistory:editing?(state.items.find(x=>x.id===editing)?.purchaseHistory||[]):[],market:editing?(state.items.find(x=>x.id===editing)?.market||null):null,marketOptions:editing?(state.items.find(x=>x.id===editing)?.marketOptions||[]):[],marketCheckedAt:editing?(state.items.find(x=>x.id===editing)?.marketCheckedAt||''):'',imageUrl:photoSelection,imageSourceUrl:photoSourceUrl});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
+    const old=editing?state.items.find(x=>x.id===editing):null;
+    if(i.price>0&&(!old||Math.abs(i.price-Number(old.price||0))>.001||i.store!==old.store))i.purchaseHistory=cleanHistory([...(i.purchaseHistory||[]),{price:i.price,store:i.store,date:new Date().toISOString(),kind:'manual'}]);
+    if(old&&old.barcode!==i.barcode){i.market=null;i.marketOptions=[];i.marketCheckedAt='';}
     if(editing){const at=state.items.findIndex(x=>x.id===editing);if(at>=0)state.items[at]=i;}else state.items.unshift(i);logAction(`${editing?'Змінено':'Додано'}: ${i.name}`);save();render();$('#product-dialog').close();showToast(editing?'Зміни збережено':'Продукт додано');if(!i.imageUrl)autoFindPhoto(i);});
   $('#delete-product').addEventListener('click',()=>{if(!editing)return;const i=state.items.find(i=>i.id===editing);if(!i)return;if(!confirm(`Видалити «${i.name}» із холодильника?`))return;state.items=state.items.filter(i=>i.id!==editing);logAction(`Видалено: ${i.name}`);save();render();$('#product-dialog').close();showToast('Продукт видалено');});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const id=b.dataset.id,act=b.dataset.action;if(act==='manualBought'){state.shopping=state.shopping.filter(i=>i.id!==id);save();render();showToast('Покупку викреслено');return;}const i=state.items.find(x=>x.id===id);if(!i)return;if(act==='edit'){openForm(i);return;}if(act==='increase')changeQty(i,1);if(act==='decrease')changeQty(i,-1);if(act==='bought'){i.qty=i.target;logAction(`Куплено: ${i.name}`);save();render();showToast('Запас поповнено');}});
@@ -1769,8 +1772,63 @@ window.InlineQRCode=req('index');
     const budget=Number(state.settings?.budget||0);
     $('#budget-hint').textContent=budget?`За останні 30 днів внесено чеків на ${euro(spent)} із бюджету ${euro(budget)} (${Math.round(spent/budget*100)}%). Підрахунок лише за відсканованими чеками.`:'Додай свій бюджет, щоб бачити співвідношення витрат.';
     $('#audit-list').innerHTML=(state.events||[]).length?state.events.slice(-8).reverse().map(x=>`<div class="audit-row"><div><b>${esc(x.text)}</b><small>${new Date(x.at).toLocaleString('uk-UA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</small></div></div>`).join(''):'<p class="smart-caption">Історія з’явиться після додавання або зміни продуктів.</p>';
-    renderRecipes();
+    renderRecipes();renderMarketPrices();
   }
+  function renderMarketPrices(){
+    const mount=$('#market-price-list');if(!mount)return;
+    const products=state.items.filter(i=>i.price>0||i.barcode||i.market);
+    if(!products.length){
+      mount.innerHTML='<p class="smart-caption">Поки немає товарів із ціною або штрихкодом. Додай реальну покупку чи відскануй чек.</p>';
+      return;
+    }
+    mount.innerHTML=products.slice(0,40).map(i=>{
+      const market=i.market, observed=market?.price, recorded=Number(i.price||0);
+      const diff=market&&recorded>0?Math.round((market.price-recorded)*100)/100:null;
+      const dated=market?market.date:'';
+      const options=(i.marketOptions||[]).filter(x=>x.shopId&&(!market||x.shopId!==market.shopId)).slice(0,4);
+      const purchased=i.purchaseHistory?.length?i.purchaseHistory[i.purchaseHistory.length-1]:null;
+      const external=market?'<div class="source-row"><span class="price-amount">'+euro(observed)+'</span><span class="store-tag">'+esc(market.shop||SHOP_NAMES[market.shopId]||'Магазин')+'</span>'+ (diff!==null?'<span class="price-diff '+(diff>0?'up':diff<0?'down':'')+'">'+(diff>0?'▲ +':diff<0?'▼ ':'')+euro(Math.abs(diff))+' до покупки</span>':'')+'</div><small>Спостерігали: '+esc(dated)+(market.city?' · '+esc(market.city):'')+(market.discount?' · акційна ціна':'')+' · це не поточний прайс</small><div class="source-row">'+(market.sourceUrl?'<a href="'+esc(market.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Джерело Open Prices</a>':'')+'</div>':'<small>Немає перевіреного запису для цього штрихкоду та магазину.</small>';
+      return '<article class="market-price-row"><div class="between"><b>'+esc(i.name)+'</b><span class="store-tag">'+esc(SHOP_NAMES[i.store]||'Магазин невідомий')+'</span></div>'+
+        (recorded?'<small>Моя ціна: '+euro(recorded)+(purchased?.date?' · '+esc(purchased.date.slice(0,10)):'')+'</small>':'<small>Власної ціни ще немає</small>')+
+        external+(options.length?'<small>Інші магазини: '+options.map(x=>esc(x.shop)+': '+euro(x.price)+' ('+esc(x.date)+')').join(' · ')+'</small>':'')+
+        (!i.barcode?'<small>Для пошуку зовнішніх цін додай штрихкод.</small>':'')+'</article>';
+    }).join('');
+  }
+  let marketRunning=false;
+  async function refreshMarketPrices(manual=false){
+    if(marketRunning)return;
+    const today=new Date().toISOString().slice(0,10);
+    const eligible=state.items.filter(i=>/^\d{8,14}$/.test(i.barcode)&& (manual||i.marketCheckedAt!==today)).slice(0,manual?20:8);
+    if(!eligible.length){
+      if(manual)showToast('Немає нових штрихкодів для перевірки.');
+      return;
+    }
+    marketRunning=true;$('#refresh-market-prices').disabled=true;
+    let found=0,missed=0,failed=0;
+    try{
+      for(const item of eligible){
+        $('#market-refresh-note').textContent='Перевірено '+(found+missed+failed)+' / '+eligible.length;
+        try{
+          const ctl=new AbortController(),timeout=setTimeout(()=>ctl.abort(),12500);
+          let response;try{response=await fetch('/api/market-prices?'+new URLSearchParams({barcode:item.barcode}),{signal:ctl.signal});}finally{clearTimeout(timeout);}
+          const data=await response.json();
+          if(!response.ok)throw Error(data.error||'Помилка');
+          const current=state.items.find(i=>i.id===item.id&&i.barcode===item.barcode);
+          if(!current)continue;
+          const opts=(data.prices||[]).map(p=>cleanMarket({...p,checkedAt:new Date().toISOString()})).filter(Boolean);
+          current.marketOptions=opts;
+          const chosen=opts.find(p=>p.shopId===current.store)||opts.find(p=>current.store&&current.store.startsWith('aldi')&&p.shopId==='aldi')||(!current.store?opts[0]:null);
+          current.market=chosen||null;
+          current.marketCheckedAt=today;
+          opts.length?found++:missed++;
+          save();renderMarketPrices();
+        }catch(e){failed++;}
+      }
+      $('#market-refresh-note').textContent='Збіги: '+found+' · без даних: '+missed+' · недоступно: '+failed+'. Перевірено '+today+'.';
+      if(manual)showToast('Пошук завершено: '+found+' товарів із відкритими цінами');
+    }finally{marketRunning=false;$('#refresh-market-prices').disabled=false;}
+  }
+  $('#refresh-market-prices').addEventListener('click',()=>refreshMarketPrices(true));
   // Barcode scanning requires camera only when the user clicks Start.
   let scanMode='barcode',barcodeScanner=null,ocrText='',receiptRows=[],ocrLastFile=null;
   function openScan(mode){
@@ -1865,6 +1923,7 @@ window.InlineQRCode=req('index');
       const T=await lazyScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js','Tesseract');
       const result=await T.recognize(file,'deu+eng',{logger:m=>{if(m.status==='recognizing text')$('#ocr-status').textContent=`Читаємо фото… ${Math.round((m.progress||0)*100)}%`;}});
       ocrText=result?.data?.text||'';
+      if(scanMode==='receipt')$('#receipt-store').value=detectStore(ocrText);
       if(!ocrText.trim())throw Error('Текст не знайдено. Зроби фото при кращому освітленні.');
       $('#ocr-preview').hidden=false;
       if(scanMode==='expiry'){
@@ -1881,20 +1940,31 @@ window.InlineQRCode=req('index');
     }catch(e){$('#ocr-status').textContent='Не вдалося розпізнати: '+(e.message||'помилка мережі чи фото');}
   }
   function importReceipt(){
-    captureReceiptRows();const selected=receiptRows.filter(x=>x.selected&&x.name);
-    const rawTotal=$('#receipt-total').value;const total=rawTotal!==''?Number(rawTotal):selected.reduce((s,r)=>s+r.price,0);
+    captureReceiptRows();
+    const selected=receiptRows.filter(x=>x.selected&&x.name);
+    const rawTotal=$('#receipt-total').value;
+    const total=rawTotal!==''?Number(rawTotal):selected.reduce((sum,r)=>sum+r.price,0);
     if(!Number.isFinite(total)||total<0||total>100000){showToast('Перевір загальну суму чека');return;}
     if(!selected.length){showToast('Вибери хоча б один товар');return;}
-    for(const r of selected){
-      const same=state.items.find(x=>x.name.toLowerCase()===r.name.toLowerCase());
-      if(same){same.qty=precision(same.qty+1);if(r.price>0)same.price=r.price;}
-      else state.items.unshift(validateItem({name:r.name,id:uid(),category:identifyCategory(r.name),qty:1,min:0,target:2,unit:'шт',price:r.price}));
-      state.shopping=state.shopping.filter(x=>x.name.toLowerCase()!==r.name.toLowerCase());
+    const store=validStore($('#receipt-store').value),purchasedAt=new Date().toISOString();
+    for(const row of selected){
+      const same=state.items.find(x=>x.name.toLocaleLowerCase('uk')===row.name.toLocaleLowerCase('uk'));
+      const item=same||validateItem({name:row.name,id:uid(),category:identifyCategory(row.name),qty:0,min:0,target:2,unit:'шт',price:0,store});
+      if(!item)continue;
+      item.qty=precision(item.qty+1);
+      if(row.price>0){
+        item.price=precision(row.price);
+        item.purchaseHistory=cleanHistory([...(item.purchaseHistory||[]),{price:item.price,date:purchasedAt,store,kind:'receipt'}]);
+      }
+      if(store)item.store=store;
+      if(!same)state.items.unshift(item);
+      state.shopping=state.shopping.filter(x=>x.name.toLocaleLowerCase('uk')!==row.name.toLocaleLowerCase('uk'));
+      if(item.barcode)autoFindPhoto(item);
     }
-    const store=$('#receipt-store').value.trim();state.receipts.push({id:uid(),date:new Date().toISOString(),store,total:precision(total)});
+    state.receipts.push({id:uid(),date:purchasedAt,store,total:precision(total)});
     state.receipts=state.receipts.slice(-100);
-    logAction(`Чек${store?' '+store:''}: ${selected.length} товарів · ${euro(total)}`);
-    save();render();closeScan();showToast(`Додано ${selected.length} товарів, перевір кількості й терміни`);
+    logAction('Чек'+(store?' '+SHOP_NAMES[store]:'')+': '+selected.length+' товарів · '+euro(total));
+    save();render();closeScan();showToast('Додано '+selected.length+' позицій. Звір назви, кількість і ціну за одиницю.');
   }
   // Layout event binding.
   [['#home-barcode','barcode'],['#home-receipt','receipt'],['#smart-barcode','barcode'],['#smart-receipt','receipt'],['#smart-expiry','expiry']].forEach(([sel,mode])=>$(sel).addEventListener('click',()=>openScan(mode)));
@@ -1934,6 +2004,8 @@ window.InlineQRCode=req('index');
   });
 
   save();render();
+  // Automatic on-open check for a small set of products only: no paid cron, no background polling.
+  if(state.items.some(i=>/^\d{8,14}$/.test(i.barcode)))refreshMarketPrices(false);
 })();
 </script>
 </body>
