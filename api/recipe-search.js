@@ -45,6 +45,9 @@ export default async function handler(req,res){
  if(req.method!=='GET')return send(res,405,{error:'GET required'});
  const q=normalizeSearch(req.query?.q);
  const limit=Math.min(LIMIT,Math.max(1,Number(req.query?.limit)||20));
+ const category=String(req.query?.category||'').slice(0,30);
+ const valid=['Супи','Основні','Салати','Сніданки','Випічка','Десерти','Гарніри','Соуси','Закуски','Напої'];
+ if(category&&!valid.includes(category))return send(res,400,{error:'Невідома категорія'});
  const url=process.env.SUPABASE_URL,apiKey=process.env.SUPABASE_ANON_KEY;
  if(!url||!apiKey)return send(res,503,{error:'Каталог рецептів не налаштований'});
  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),8000);
@@ -52,7 +55,7 @@ export default async function handler(req,res){
   const response=await fetch(url.replace(/\/$/,'')+'/rest/v1/rpc/polychka_find_recipes',{
    method:'POST',signal:ctrl.signal,
    headers:{apikey:apiKey,Authorization:'Bearer '+apiKey,'Content-Type':'application/json'},
-   body:JSON.stringify({search_term:q,max_rows:limit})
+   body:JSON.stringify({search_term:q,max_rows:limit,category_filter:category})
   });
   if(!response.ok)throw Error('Catalog '+response.status);
   const rows=await response.json();if(!Array.isArray(rows))throw Error('Invalid catalog response');
@@ -62,7 +65,7 @@ export default async function handler(req,res){
    steps:Array.isArray(x.steps)?x.steps:[],aliases:x.aliases||[],tags:x.tags||[],
    origin:'Поличка',sourceUrl:'',imageUrl:''
   }));
-  if(q.length>=3&&recipes.length===0)recipes=await getMeals(q);
+  if(!category&&q.length>=3&&recipes.length===0)recipes=await getMeals(q);
   return send(res,200,{recipes,total:recipes.length,query:q,source:recipes.some(x=>x.origin==='TheMealDB')?'TheMealDB':'Polychka/Supabase',catalog:'115 початкових рецептів'});
  }catch(e){
   return send(res,503,{error:'Каталог тимчасово недоступний. Спробуй повторити пошук.'});
