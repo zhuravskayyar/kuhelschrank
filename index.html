@@ -1,0 +1,1788 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fffdf8" />
+  <meta name="description" content="Мій холодильник — запаси, список покупок та терміни придатності." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <title>Поличка — продукти та покупки</title>
+  <style>
+    :root { color-scheme: light; --ink:#203b34; --ink2:#68786e; --deep:#164e3c; --leaf:#d6edc1; --paper:#f6f7f2; --white:#fff; --stroke:#e7ebe2; --amber:#9c5b1b; --red:#ad4d3d; --shadow:0 10px 35px rgba(20,62,47,.06); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+    *,*::before,*::after{box-sizing:border-box} body{margin:0;background:#e9ede6;color:var(--ink);-webkit-tap-highlight-color:transparent} button,input,select{font:inherit} button{cursor:pointer} button:disabled{cursor:not-allowed;opacity:.35} input,select{outline:none} button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #7da991;outline-offset:2px}
+    .app{max-width:490px;min-height:100dvh;margin:auto;background:var(--paper);position:relative;overflow:hidden;box-shadow:0 0 50px rgba(26,45,37,.12)}
+    .main{padding:env(safe-area-inset-top) 20px calc(104px + env(safe-area-inset-bottom));min-height:100dvh}
+    .top{display:flex;align-items:center;justify-content:space-between;padding:21px 0 25px}
+    .brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;letter-spacing:-.5px}.mark{width:35px;height:35px;display:grid;place-items:center;background:var(--deep);border-radius:12px;color:#e1f3d5}.mark svg{width:19px;height:19px}
+    .top-right{display:flex;align-items:center;gap:7px;color:#66766c;font-size:11px;font-weight:700;background:#edf0e9;border:1px solid #e4e9df;border-radius:22px;padding:8px 11px}.top-right i{width:7px;height:7px;border-radius:50%;background:#76b17a}
+    .section{display:none;animation:appear .2s ease}.section.active{display:block}@keyframes appear{from{opacity:.55;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    h1,h2,h3,p{margin:0} .eyebrow{font-size:12px;color:#799086;font-weight:700;letter-spacing:.2px}.page-title{font-size:31px;line-height:1.12;letter-spacing:-1.4px;font-weight:820;margin-top:9px}.intro{color:#748079;font-size:13px;line-height:1.5;margin-top:9px}
+    .hero{background:var(--deep);border-radius:25px;padding:24px 23px 20px;color:white;margin:25px 0 18px;position:relative;overflow:hidden;min-height:195px;isolation:isolate}.hero:after{content:'';width:245px;height:245px;position:absolute;z-index:-1;right:-91px;top:-94px;border-radius:50%;border:37px solid rgba(205,235,196,.08);box-shadow:0 0 0 22px rgba(205,235,196,.035)}
+    .hero-label{font-size:12px;color:#c4dbcc;font-weight:650}.hero-number{font-size:60px;font-weight:850;letter-spacing:-4px;line-height:1.1;margin:5px 0 2px}.hero-unit{font-size:13px;color:#e2eee0}.hero-stats{margin-top:22px;display:flex;gap:9px}.mini-stat{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.10);display:flex;align-items:center;gap:7px;border-radius:10px;padding:9px 10px;color:#eff9e9;font-size:11px;font-weight:650;min-width:0}.mini-stat svg{width:15px;height:15px;flex-shrink:0}.mini-stat b{font-size:13px}
+    .demo{display:flex;align-items:center;gap:10px;background:#fff9e9;border:1px solid #f0e4c6;border-radius:16px;padding:12px 13px;margin-bottom:21px}.demo .tiny{font-size:10px;color:#94672f;font-weight:800}.demo p{font-size:11px;color:#846f4e;margin-top:2px;line-height:1.35}.demo button{border:0;color:#805b26;background:#f6e8c8;border-radius:9px;padding:8px 9px;font-size:11px;font-weight:800;white-space:nowrap}
+    .between{display:flex;justify-content:space-between;align-items:center;gap:8px}.section-heading{font-size:20px;font-weight:830;letter-spacing:-.6px}.text-btn{background:transparent;border:0;color:#257453;font-size:12px;font-weight:800;padding:8px 0}
+    .search{height:46px;background:#fff;border:1px solid var(--stroke);border-radius:14px;margin:16px 0 12px;display:flex;align-items:center;padding:0 14px;gap:10px;box-shadow:0 3px 15px rgba(0,0,0,.015)}.search svg{color:#8c9a90;width:18px;height:18px;flex-shrink:0}.search input{border:none;background:transparent;flex:1;min-width:0;color:var(--ink);font-size:13px}.search input::placeholder{color:#9ba89c}
+    .chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 -20px 15px;padding:0 20px}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap;border-radius:30px;padding:9px 13px;background:white;border:1px solid #e4ebe0;color:#79877e;font-size:11px;font-weight:800}.chip.active{background:#d9ecd0;color:#2b6247;border-color:#d9ecd0}
+    .list{display:grid;gap:10px}.item{display:flex;gap:12px;align-items:center;background:white;border:1px solid var(--stroke);border-radius:18px;padding:12px 12px;box-shadow:0 3px 16px rgba(35,60,46,.024);min-height:76px}.food-icon{height:52px;width:52px;background:#eef4e9;border-radius:15px;display:grid;place-items:center;font-size:27px;flex-shrink:0}.food-icon.dairy{background:#ecf4fb}.food-icon.meat{background:#fbefe9}.food-icon.bakery{background:#f7f0e3}.food-icon.other{background:#f4eff8}.food-icon.fruit{background:#eef5e5}
+    .item-copy{flex:1;min-width:0}.item-name{border:0;background:none;color:#213d34;text-align:left;padding:0;font-size:14px;font-weight:800;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.item-sub{font-size:10px;color:#92a096;margin-top:5px;display:flex;align-items:center;gap:5px;line-height:1.3}.dot{display:inline-block;width:3px;height:3px;border-radius:50%;background:#b2bfb3}.status{display:inline-block;margin-top:6px;font-size:10px;font-weight:750;color:#3f8669}.status.warn{color:var(--amber)}.status.danger{color:var(--red)}
+    .quantity{display:flex;gap:4px;align-items:center;flex-shrink:0}.quantity button{height:30px;width:28px;border:none;border-radius:9px;background:#eff4ee;color:#36674d;font-size:19px;line-height:1;font-weight:500;display:grid;place-items:center}.quantity button.plus{background:#d7e9ce;color:#285c40}.quantity-val{text-align:center;min-width:34px;font-size:14px;font-weight:850;letter-spacing:-.4px}.quantity-val small{display:block;font-weight:650;font-size:9px;letter-spacing:0;color:#99a69b;margin-top:1px}
+    .action-wide{display:flex;align-items:center;justify-content:center;gap:9px;min-height:49px;border:1px dashed #a9c9ae;background:#edf5e8;border-radius:15px;color:#285f48;font-size:13px;font-weight:800;width:100%;margin-top:14px}.action-wide svg{width:17px;height:17px}
+    .empty{padding:35px 15px;text-align:center;background:#fff;border:1px dashed #dce5d8;border-radius:18px;color:#86978a}.empty-illustration{font-size:32px;margin-bottom:9px}.empty b{display:block;font-size:14px;color:#37584a}.empty p{font-size:12px;margin-top:7px;line-height:1.5}
+    .subbar{margin:24px 0 11px;color:#8b9c8d;font-size:10px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase}
+    .buy-item{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--stroke);border-radius:16px;padding:13px;min-height:70px}.buy-check{width:31px;height:31px;border:1.5px solid #c3d7c5;border-radius:10px;flex-shrink:0;display:grid;place-items:center;color:transparent;background:#f6faf4}.buy-check:hover{color:#317653}.buy-icon{font-size:21px}.buy-info{flex:1;min-width:0}.buy-info b{display:block;font-size:13px}.buy-info p{font-size:11px;color:#9aaa9c;margin-top:3px}.pill{font-size:10px;padding:6px 8px;border-radius:8px;background:#e8f2e2;color:#317650;font-weight:750;white-space:nowrap}.pill.note{background:#fff3df;color:#93652d}
+    .inline-form{display:flex;gap:8px;background:white;border:1px solid #e0e9dc;padding:7px;border-radius:14px;margin-top:12px}.inline-form input{flex:1;width:0;border:0;padding-left:8px;font-size:13px}.inline-form button{border:0;border-radius:10px;padding:11px 14px;background:var(--deep);color:white;font-size:12px;font-weight:800}
+    .notice{font-size:11px;color:#8a9a90;line-height:1.6;margin-top:15px;padding:0 2px}
+    .expiry-card{padding:15px;background:white;border:1px solid var(--stroke);border-radius:15px;display:flex;align-items:center;gap:12px}.expiry-date{width:53px;flex-shrink:0;text-align:center;background:#f4f6ee;border-radius:12px;padding:9px 5px}.expiry-date b{display:block;font-size:18px;color:#395d48}.expiry-date small{font-size:9px;color:#92a091;font-weight:750;text-transform:uppercase}.expiry-detail{flex:1}.expiry-detail b{font-size:13px}.expiry-detail p{margin-top:4px;font-size:11px;color:#829488}.expiry-card.urgent .expiry-date{background:#fff0df}.expiry-card.urgent .expiry-date b{color:#a66821}
+    .tip{display:flex;gap:12px;background:#eaf2e4;border-radius:18px;padding:16px;margin-top:21px}.tip .tip-icon{font-size:23px}.tip strong{font-size:13px}.tip p{font-size:12px;line-height:1.55;color:#63816b;margin-top:5px}
+    .qr-panel{margin-top:20px;background:white;border-radius:23px;padding:22px;border:1px solid var(--stroke);box-shadow:var(--shadow);text-align:center}.qr-frame{width:210px;height:210px;border-radius:16px;display:grid;place-items:center;background:#f6f8f4;margin:0 auto 15px;overflow:hidden}.qr-frame svg{width:190px;height:190px}.qr-frame .placeholder{font-size:57px;color:#a4b9a6}.qr-panel h3{font-size:16px}.qr-panel p{margin:8px auto 0;max-width:280px;color:#86978b;font-size:11px;line-height:1.5}.field-label{font-size:11px;font-weight:800;display:block;text-align:left;margin:17px 0 6px}.field{height:43px;width:100%;border:1px solid #dee7dc;border-radius:11px;background:#fbfcfa;padding:0 12px;font-size:12px;color:var(--ink)}.primary{width:100%;border:0;background:var(--deep);color:#fff;border-radius:13px;min-height:45px;margin-top:10px;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px}.primary svg{width:17px;height:17px}.secondary-actions{display:flex;gap:9px;margin-top:9px}.secondary-actions button{flex:1;background:#eff4eb;border:0;border-radius:12px;padding:12px 7px;color:#426e54;font-size:11px;font-weight:800}.secondary-actions button:disabled{opacity:.35}.qr-warning{display:flex;gap:11px;text-align:left;margin-top:18px;background:#fff6e7;border:1px solid #f4e6ce;border-radius:15px;padding:13px}.qr-warning svg{flex-shrink:0;width:18px;height:18px;color:#ae762c}.qr-warning p{margin:0;max-width:none;color:#846e4b;font-size:11px;line-height:1.5}
+    .data-tools{display:flex;gap:8px}.data-tools button{flex:1;min-height:42px;background:white;border:1px solid var(--stroke);border-radius:12px;font-size:12px;font-weight:800;color:#507262}
+    .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:490px;background:rgba(255,255,255,.96);backdrop-filter:blur(15px);display:grid;grid-template-columns:repeat(5,1fr);padding:11px 8px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -7px 25px rgba(33,71,45,.05);border-top:1px solid #edf1e9;z-index:5}.nav button{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:transparent;color:#97a59c;font-size:10px;font-weight:750;padding:4px 1px;position:relative}.nav button svg{width:21px;height:21px;stroke-width:1.8}.nav button.active{color:#205f43}.nav button.active:before{content:'';position:absolute;top:-11px;width:31px;height:3px;background:#4a9f63;border-radius:0 0 6px 6px}.nav .count-badge{position:absolute;top:0;left:calc(50% + 7px);background:#ed9b69;color:white;font-size:9px;border-radius:9px;padding:1px 4px;font-weight:800}
+    dialog{max-width:490px;width:calc(100% - 20px);max-height:min(90dvh,780px);border:0;border-radius:23px 23px 17px 17px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 24px 90px rgba(10,35,21,.25)}dialog::backdrop{background:rgba(11,38,26,.46);backdrop-filter:blur(2px)}.sheet{padding:23px 19px 20px;overflow-y:auto;max-height:90dvh}.sheet-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:19px}.sheet-header h2{font-size:22px;letter-spacing:-.7px}.close{border:0;background:#e8eee6;border-radius:50%;width:31px;height:31px;font-size:21px;color:#5e7768;display:grid;place-items:center}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.form-group{min-width:0}.form-group.full{grid-column:1/-1}.form-group label{font-size:11px;font-weight:800;display:block;margin-bottom:6px;color:#54705c}.form-group input,.form-group select{display:block;width:100%;background:white;border:1px solid #dee7db;height:43px;border-radius:12px;padding:0 11px;color:#213b2c;font-size:13px}.form-help{font-size:10px;color:#899b8c;line-height:1.45;margin-top:6px}.form-error{min-height:15px;color:#ad4d3d;font-size:11px;margin-top:10px}.danger-btn{border:0;background:transparent;color:#b45c4a;padding:11px 2px;margin-top:6px;font-size:12px;font-weight:800}.toast{position:fixed;bottom:calc(87px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,10px);background:#173f30;color:white;padding:12px 17px;border-radius:13px;font-size:12px;max-width:calc(100% - 35px);width:max-content;box-shadow:0 10px 35px rgba(0,0,0,.18);z-index:12;pointer-events:none;opacity:0;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(min-width:550px){.app{margin:24px auto;min-height:calc(100dvh - 48px);border-radius:29px}.main{min-height:calc(100dvh - 48px)}.nav{border-radius:0 0 29px 29px;bottom:24px} }
+    @media(max-width:360px){.main{padding-left:14px;padding-right:14px}.chips{margin-left:-14px;margin-right:-14px;padding:0 14px}.hero{padding:21px 15px}.mini-stat{padding:8px 7px;font-size:10px}.item{padding:9px 8px;gap:8px}.food-icon{width:43px;height:48px}.quantity{gap:2px}.quantity button{width:26px}.quantity-val{min-width:28px}}
+    @media print{body,.app{background:white;box-shadow:none;margin:0;padding:0}.main{padding:0}.top,.section,.nav,.qr-form,.qr-warning,.data-section,.secondary-actions,.notice{display:none!important}#screen-qr{display:block!important}#screen-qr>.eyebrow,#screen-qr>.page-title,#screen-qr>.intro{display:none}#printable{border:0;box-shadow:none;margin:0;padding:12mm;width:100%}.qr-frame{width:80mm;height:80mm}.qr-frame svg{width:76mm;height:76mm}.qr-panel p{font-size:12px}}
+  
+/* Pastel palette — soft lavender, mint, peach and powder blue */
+:root{--ink:#393d50;--ink2:#777b8d;--deep:#7777aa;--leaf:#d8eddd;--paper:#faf7f8;--white:#fffdfd;--stroke:#eae5ed;--amber:#a87942;--red:#b66f7a;--shadow:0 10px 32px rgba(93,83,125,.07)}
+body{background:#eee9f1}
+.app{background:var(--paper)}
+.mark{background:#dcd6f1;color:#625b93}
+.top-right{background:#e7f3eb;border-color:#d7e8dc;color:#567a67}
+.hero{background:linear-gradient(135deg,#b9b4dc 0%,#c5d9e8 55%,#c6e5d6 100%);color:#383e58}
+.hero-label,.hero-unit{color:#525d75}
+.mini-stat{background:rgba(255,255,255,.45);border-color:rgba(255,255,255,.7);color:#454d66}
+.hero:after{border-color:rgba(255,255,255,.22);box-shadow:0 0 0 22px rgba(255,255,255,.08)}
+.demo{background:#fff2e9;border-color:#f4dfd4}.demo button{background:#f5dccc;color:#875f57}
+.text-btn{color:#7771a9}.chip{background:#fffdfd;border-color:#eae4ef;color:#777489}.chip.active{background:#ded9f2;border-color:#ded9f2;color:#5f568b}
+.item,.buy-item,.expiry-card,.search,.qr-panel{background:#fffdfd}
+.food-icon{background:#e0f0e6}.food-icon.dairy{background:#dfeefa}.food-icon.meat{background:#fae1dc}.food-icon.bakery{background:#faedda}.food-icon.other{background:#ede4f6}.food-icon.fruit{background:#e5f1d8}
+.quantity button{background:#efebf6;color:#6b6494}.quantity button.plus{background:#dceee3;color:#49785c}
+.action-wide{background:#e6f2eb;border-color:#bfd9c9;color:#507b63}
+.pill{background:#e1f0e6;color:#517a61}.pill.note{background:#fff0df;color:#986f48}
+.tip{background:#e8e5f6}.tip p{color:#74718f}.expiry-date{background:#e8f0fa}.expiry-card.urgent .expiry-date{background:#ffecdf}
+.qr-frame{background:#f1eef7}.primary,.inline-form button{background:#7777aa}.secondary-actions button{background:#eee9f7;color:#6c6398}
+.nav{background:rgba(255,252,254,.97);border-color:#eae4ef}.nav button.active{color:#716ba2}.nav button.active:before{background:#a99bd4}.nav .count-badge{background:#e6a6a0}
+.close{background:#efeaf5}.toast{background:#67658d}
+
+
+/* POLYCHKA / pastel neo-brutal mobile system */
+:root{--ink:#19191c;--ink2:#5b5a64;--deep:#1a1a1d;--paper:#fffdf8;--white:#fff;--stroke:#18181b;--shadow:4px 5px 0 #1a1a1d;--mint:#b8e7d6;--lilac:#d7c7fa;--pink:#ffc6d5;--peach:#ffdbc5;--lemon:#ffe68f;--blue:#c9e6ff;color-scheme:light;font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+html{scroll-behavior:smooth}body{background:#eeeaf2;color:var(--ink)}.app{background:var(--paper);box-shadow:0 0 0 1px #e7e3de;overflow:clip}
+.main{padding:env(safe-area-inset-top) 19px calc(108px + env(safe-area-inset-bottom))}.top{padding:21px 0 28px}.brand{gap:9px;color:var(--ink);font-size:22px;letter-spacing:-1px;font-weight:950}.brand-dot{color:#e884a6}.mark{width:42px;height:42px;border-radius:12px;border:2.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:var(--mint);color:var(--ink)}.mark svg{width:23px;height:23px;stroke-width:2.5}.top-right{border:2px solid var(--ink);border-radius:11px;background:var(--lilac);box-shadow:3px 3px 0 var(--ink);height:41px;min-width:81px;display:flex;gap:7px;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--ink);padding:0 10px}.top-right svg{height:19px;width:19px}.top-right:active,.folder-card:active,.quick-food:active,.action-add:active,.action-cart:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:#69626f;font-weight:900}.page-title{font-weight:950;font-size:clamp(35px,10vw,49px);letter-spacing:-2.45px;line-height:1.01;margin-top:10px}.title-accent{background:linear-gradient(transparent 67%,#fbd2dc 67%);padding-right:5px}.intro{font-size:13px;line-height:1.55;margin-top:12px;color:#5d5a64;font-weight:600}.home-intro{margin-bottom:20px}
+.hero{margin:0 0 18px;padding:19px 18px 14px;background:var(--mint);border:2.5px solid var(--ink);border-radius:17px;box-shadow:5px 6px 0 var(--ink);min-height:0;overflow:visible;color:var(--ink)}.hero::after{display:none}.hero-top{display:flex;align-items:flex-start;justify-content:space-between}.hero-label{font-weight:850;letter-spacing:.1px;font-size:12px;color:#2b3a36}.hero-number{font-size:63px;letter-spacing:-4px;font-weight:950;line-height:1;margin:10px 0 0;display:flex;gap:9px;align-items:baseline}.hero-measure{font-size:15px;font-weight:850;letter-spacing:-.2px}.hero-unit{font-size:11px;font-weight:700;color:#4b6861;margin-top:4px}.hero-illustration{font-family:Arial,sans-serif;color:#fffef9;text-shadow:2px 2px 0 var(--ink),-2px -2px 0 var(--ink),2px -2px 0 var(--ink),-2px 2px 0 var(--ink);font-size:85px;line-height:1;transform:rotate(-10deg);padding-right:1px}.hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:20px}.mini-stat{border:2px solid var(--ink);background:#fffefa;color:var(--ink);border-radius:10px;padding:10px 8px;min-height:47px;font-size:11px;gap:6px;display:flex;align-items:center;text-align:left;justify-content:start;white-space:nowrap;box-shadow:2px 3px 0 var(--ink)}.mini-stat b{font-size:15px}.mini-symbol{font-size:19px;font-weight:900}.stat-arrow{margin-left:auto;font-size:16px;font-weight:900}.mini-stat:hover{background:#fff5d2}
+.home-actions{display:grid;grid-template-columns:minmax(0,1fr) 57px;gap:10px;margin:24px 0 31px}.action-add,.action-cart{height:58px;border:2.5px solid var(--ink);border-radius:12px;box-shadow:4px 5px 0 var(--ink);background:var(--lemon);color:var(--ink);font-weight:900;display:flex;align-items:center;justify-content:space-between;padding:0 13px;gap:8px;font-size:14px}.action-cart{background:var(--pink);display:grid;place-items:center;padding:0}.action-cart svg{width:25px;height:25px}.action-icon{width:31px;height:31px;border:2px solid var(--ink);background:white;border-radius:8px;font-size:22px;line-height:1;display:grid;place-items:center}.action-arrow{font-size:21px}.section-heading{font-size:19px;font-weight:950;letter-spacing:-.65px}.section-doodle{color:#cf8aaa;font-size:20px}.subtle-hint{font-size:10px;font-weight:750;color:#858087}.folders-title{margin-bottom:20px}
+.folder-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 13px;margin-bottom:29px}.folder-card{position:relative;min-width:0;height:134px;padding:15px 12px 12px;background:white;border:2.5px solid var(--ink);border-radius:12px;box-shadow:5px 6px 0 var(--ink);color:var(--ink);display:flex;flex-direction:column;text-align:left;justify-content:space-between;transition:transform .12s,box-shadow .12s}.folder-tab{position:absolute;z-index:0;pointer-events:none;top:-13px;left:11px;width:53%;height:19px;border:2.5px solid var(--ink);border-radius:8px 9px 0 0;background:var(--folder-color);box-shadow:3px 0 0 var(--ink)}.folder-card:before{content:"";position:absolute;z-index:1;pointer-events:none;top:0;left:0;right:0;height:9px;background:var(--folder-color);border-radius:8px 8px 0 0;border-bottom:2px solid var(--ink)}.folder-card.all{--folder-color:var(--lemon)}.folder-card.dairy{--folder-color:var(--blue)}.folder-card.fruit{--folder-color:var(--mint)}.folder-card.meat{--folder-color:var(--pink)}.folder-card.bakery{--folder-color:var(--peach)}.folder-card.other{--folder-color:var(--lilac)}.folder-card.selected{outline:3px solid var(--folder-color);outline-offset:2px}.folder-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-top:2px}.folder-icon{background:var(--folder-color);border:2px solid var(--ink);border-radius:9px;width:45px;height:45px;display:grid;place-items:center;font-size:24px}.folder-count{font-size:12px;font-weight:800;color:#6b6873}.folder-name{font-weight:950;font-size:13px;line-height:1.14;letter-spacing:-.3px;max-width:112px}.folder-arrow{position:absolute;bottom:10px;right:11px;font-size:18px;font-weight:850}.fast-title{margin-bottom:12px}.quick-list{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:1px 1px 7px;margin-bottom:23px}.quick-food{min-width:max-content;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:9px 8px;box-shadow:2px 3px 0 var(--ink);font-size:11px;font-weight:850;display:flex;align-items:center;gap:5px}.quick-food span{font-size:19px}.quick-food b{font-size:17px}.quick-food:nth-child(2){background:#fbebf4}.quick-food:nth-child(3){background:#fff2d9}
+.demo{border:2px solid #262123;border-radius:12px;background:#fff6d2;box-shadow:3px 3px 0 var(--ink);margin-bottom:25px}.demo .tiny{color:var(--ink)}.demo p{color:#58535c}.demo button{background:#ffe6b0;color:var(--ink);border:1.5px solid var(--ink)}
+.inventory-title{margin:10px 0 2px}.inventory-title #inventory-label{font-size:12px;color:#827b87;font-weight:750}.text-btn{color:var(--ink);font-weight:950;font-size:12px}.search{background:white;border:2px solid var(--ink);box-shadow:3px 4px 0 var(--ink);border-radius:11px;height:49px;margin:15px 0 15px}.search svg{color:var(--ink)}.search input{font-size:14px}.search input::placeholder{color:#898490}.chips{margin-bottom:18px;gap:7px}.chip{border:1.7px solid var(--ink);color:var(--ink);border-radius:9px;padding:9px 13px;font-weight:850;background:#fff;font-size:11px}.chip.active{background:var(--lilac);border-color:var(--ink);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.list{gap:12px}.item{border:2px solid var(--ink);box-shadow:3px 4px 0 var(--ink);border-radius:12px;padding:10px;min-height:82px;background:white;gap:11px}.food-icon{width:51px;height:56px;border-radius:9px;border:1.7px solid var(--ink);background:var(--mint);font-size:27px}.food-icon.dairy{background:var(--blue)}.food-icon.meat{background:var(--pink)}.food-icon.bakery{background:var(--peach)}.food-icon.other{background:var(--lilac)}.food-icon.fruit{background:var(--mint)}.item-name{font-size:14px;font-weight:950;color:var(--ink)}.item-sub{font-size:10px;font-weight:650;color:#77737b;margin-top:5px;flex-wrap:wrap}.status{font-size:10px;color:#306e53;font-weight:850}.status.warn{color:#9e562d}.status.danger{color:#af3453}.quantity{gap:4px}.quantity button{width:31px;height:33px;background:#fff;border:1.7px solid var(--ink);border-radius:8px;color:var(--ink);font-size:20px;font-weight:900}.quantity button.plus{background:var(--mint);color:var(--ink)}.quantity button:active{background:var(--lemon)}.quantity-val{min-width:29px;color:var(--ink);font-size:14px}.quantity-val small{color:#68626d;font-weight:700}.action-wide{border:2px dashed var(--ink);border-radius:12px;background:#f4f0ff;color:var(--ink);min-height:54px;font-size:13px;margin-top:20px}
+.empty{background:white;border:2px dashed #aba6ac;border-radius:12px;color:#66616c}.empty b{color:var(--ink);font-weight:950}.empty p{color:#77727a}
+#screen-shopping .page-title,#screen-plan .page-title,#screen-qr .page-title{margin-bottom:5px}.shopping-hero{position:relative;margin-top:24px;padding:22px 20px;background:var(--lilac);border:2.5px solid var(--ink);border-radius:15px;box-shadow:5px 6px 0 var(--ink);overflow:hidden}.shopping-hero .hero-number{font-size:66px;display:block}.shopping-hero .hero-unit{color:#44404c}.shopping-splash{position:absolute;top:0;right:17px;transform:rotate(-20deg);font-size:90px;color:#fefaf3;text-shadow:2px 2px 0 var(--ink),-2px -2px 0 var(--ink)}.copy-shopping{border:2px solid var(--ink);box-shadow:2px 3px 0 var(--ink);background:white;display:flex;align-items:center;justify-content:space-between;padding:10px 13px;margin-top:19px;border-radius:9px;font-weight:850;min-height:43px;width:100%;font-size:13px}.copy-shopping span{font-size:18px}.subbar{color:#68626a;margin:31px 0 13px;letter-spacing:.55px;font-size:11px}.subbar span{background:#f5e5bf;color:#514736;border-radius:6px;padding:3px 6px;letter-spacing:0;text-transform:none;margin-left:6px}.buy-item{border:2px solid var(--ink);border-radius:11px;box-shadow:3px 4px 0 var(--ink);padding:12px 11px;min-height:74px}.buy-check{border:2px solid var(--ink);border-radius:7px;width:31px;height:31px;background:white;color:transparent;font-size:17px;font-weight:950}.buy-check:hover{background:var(--mint);color:var(--ink)}.buy-info b{font-size:14px;font-weight:900}.buy-info p{color:#76717b}.pill{border:1.4px solid var(--ink);border-radius:7px;background:var(--mint);color:var(--ink);font-size:10px}.pill.note{background:var(--peach);color:var(--ink)}.inline-form{border:2px solid var(--ink);border-radius:10px;box-shadow:3px 4px 0 var(--ink);padding:5px;margin-top:17px}.inline-form button{background:var(--lemon);color:var(--ink);border:1.5px solid var(--ink);border-radius:7px;font-size:12px}.inline-form input{color:var(--ink)}.notice{color:#6d6874;font-weight:550;line-height:1.6;font-size:11px}
+.expiry-card{border:2px solid var(--ink);border-radius:11px;box-shadow:3px 4px 0 var(--ink);padding:12px}.expiry-date{background:var(--blue);border:1.5px solid var(--ink);border-radius:9px}.expiry-date b,.expiry-date small{color:var(--ink)}.expiry-card.urgent .expiry-date{background:var(--pink)}.expiry-card.urgent .expiry-date b{color:var(--ink)}.expiry-detail b{font-size:14px}.expiry-detail p{color:#69616c}.tip{border:2px solid var(--ink);border-radius:13px;background:var(--mint);box-shadow:3px 4px 0 var(--ink)}.tip p{color:#44524d}
+.qr-panel{border:2.5px solid var(--ink);border-radius:15px;box-shadow:5px 5px 0 var(--ink);margin-top:26px;padding:20px;background:white}.qr-frame{background:#f9f7ff;border:1.5px dashed #8c8590;border-radius:11px;width:220px;height:220px}.qr-panel h3{font-weight:950;color:var(--ink)}.qr-panel p{color:#706b73}.field-label{color:var(--ink);font-size:12px}.field{height:47px;border:2px solid var(--ink);border-radius:10px;background:white;color:var(--ink);font-size:13px}.primary{border:2px solid var(--ink);background:var(--mint);color:var(--ink);border-radius:10px;box-shadow:3px 4px 0 var(--ink);min-height:49px;margin-top:13px;font-size:13px}.secondary-actions{margin-top:15px}.secondary-actions button{border:1.7px solid var(--ink);border-radius:9px;background:white;color:var(--ink);font-weight:800}.qr-warning{background:#fff0c7;border:2px solid var(--ink);border-radius:11px}.qr-warning svg,.qr-warning p{color:var(--ink)}.data-tools button{border:2px solid var(--ink);color:var(--ink);border-radius:10px;background:white;box-shadow:2px 3px 0 var(--ink)}
+.nav{z-index:9;max-width:490px;background:#fffdf8;border-top:2px solid var(--ink);box-shadow:0 -3px 0 rgba(26,26,29,.05);padding:10px 10px calc(11px + env(safe-area-inset-bottom));gap:4px}.nav button{color:#68646d;font-size:10px;gap:5px;border-radius:9px;font-weight:850;padding:8px 1px 7px;min-width:0}.nav button svg{width:21px;height:21px;stroke-width:2.1}.nav button.active{background:var(--lemon);border:1.7px solid var(--ink);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}.nav button.active:before{display:none}.nav .count-badge{top:-5px;background:var(--pink);border:1px solid var(--ink);color:var(--ink);border-radius:6px;padding:1px 5px;font-size:9px}
+dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;box-shadow:6px 7px 0 var(--ink);width:calc(100% - 24px);max-height:88dvh}dialog::backdrop{background:rgba(26,22,36,.6);backdrop-filter:blur(3px)}.sheet{padding:21px 17px 20px;max-height:85dvh}.sheet-header h2{font-size:23px;font-weight:950;color:var(--ink)}.close{background:var(--pink);border:2px solid var(--ink);border-radius:9px;color:var(--ink);font-weight:900;font-size:19px;width:34px;height:34px}.form-group label{font-size:12px;color:#343035;font-weight:850}.form-group input,.form-group select{border:2px solid var(--ink);border-radius:9px;color:var(--ink);font-size:14px;background:white;height:45px}.form-help{color:#736c76}.form-error{color:#a32648}.danger-btn{color:#9e294b;font-weight:850}.toast{background:#19191c;color:#fffdf8;border:2px solid white;box-shadow:4px 5px 0 var(--pink);border-radius:9px;font-size:12px;font-weight:800}
+@media(min-width:550px){.app{border-radius:23px;margin:20px auto;min-height:calc(100dvh - 40px)}.main{min-height:calc(100dvh - 40px)}.nav{bottom:20px;border-radius:0 0 23px 23px}}
+@media(max-width:360px){.main{padding-left:14px;padding-right:14px}.folder-grid{gap:20px 10px}.folder-card{height:130px;padding:14px 9px 10px}.folder-name{font-size:12px}.hero{padding:15px 12px}.hero-illustration{font-size:70px}.mini-stat{font-size:10px;padding:8px 6px;gap:4px}.folder-count{font-size:11px}.quantity button{width:27px}.item{gap:7px}.food-icon{width:44px;height:49px}.chips{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media print{.folder-grid,.home-actions,.quick-list{display:none!important}#printable{border:none!important;box-shadow:none!important}.qr-frame{border:0}}
+
+
+/* SMART POLYCHKA — native pastel tools, compact on phones */
+.smart-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:-9px 0 27px}
+.smart-trigger{border:2px solid var(--ink);border-radius:12px;min-height:73px;background:var(--blue);box-shadow:3px 4px 0 var(--ink);display:flex;align-items:center;gap:9px;text-align:left;padding:11px;font-weight:950;color:var(--ink);font-size:12px;line-height:1.2}.smart-trigger:nth-child(2){background:var(--peach)}.smart-trigger:active{transform:translate(2px,2px);box-shadow:1px 2px 0 var(--ink)}.smart-trigger .big{font-size:28px}
+.assist-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:23px 0}.assist-tile{border:2.3px solid var(--ink);border-radius:12px;box-shadow:4px 5px 0 var(--ink);text-align:left;padding:15px 12px;background:var(--mint);min-height:123px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;color:var(--ink)}.assist-tile:nth-child(2){background:var(--blue)}.assist-tile:nth-child(3){background:var(--peach)}.assist-tile:nth-child(4){background:var(--lilac)}.assist-tile strong{font-size:14px;font-weight:950}.assist-tile small{font-size:10px;line-height:1.35;font-weight:650;color:#4d4a53}.assist-tile .glyph{font-size:29px}
+.smart-panel{border:2px solid var(--ink);border-radius:12px;background:white;box-shadow:3px 4px 0 var(--ink);padding:15px;margin:16px 0}.smart-panel h3{font-size:17px;font-weight:950;margin-bottom:9px}.smart-panel p{font-size:12px;line-height:1.55;color:#625c66}.recipe-list,.audit-list{display:grid;gap:11px;margin:14px 0}.recipe{border:2px solid #1a1a1d;background:#fff;border-radius:12px;padding:13px;box-shadow:3px 3px 0 #1a1a1d}.recipe-top{display:flex;gap:11px;align-items:center}.recipe-emoji{font-size:32px;width:42px;text-align:center}.recipe strong{font-size:14px}.recipe small{font-size:11px;color:#6e6570;line-height:1.6}.recipe-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}.recipe-actions button,.outline-small{background:var(--lemon);border:1.7px solid var(--ink);padding:8px 11px;border-radius:8px;font-weight:850;color:var(--ink);font-size:11px}.recipe-actions button:disabled{opacity:.4}
+.smart-input{height:43px;max-width:100%;width:100%;padding:9px 11px;border:2px solid #1a1a1d;border-radius:9px;background:#fff;font-size:13px;color:var(--ink)}.scan-area{min-height:90px;background:#f7f2fb;border:2px dashed #a79dab;border-radius:12px;padding:12px;margin:12px 0;text-align:center}.scan-area video{max-width:100%;border-radius:8px}.smart-row{display:flex;align-items:center;gap:9px;margin:10px 0}.smart-row>*{min-width:0}.smart-row button{flex:none}.smart-note{font-size:11px;line-height:1.5;color:#77717e;margin:9px 0}.smart-output{background:#f7f4ff;border:1.5px solid #c5b7de;border-radius:10px;padding:12px;margin:12px 0;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word}.receipt-row{display:grid;grid-template-columns:20px 1fr 75px;gap:6px;align-items:center;margin:8px 0}.receipt-row input[type=text]{font-size:12px}.receipt-row input[type=number]{font-size:12px}.receipt-table{max-height:230px;overflow-y:auto;padding:2px}.summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:15px 0}.summary-box{border:2px solid var(--ink);border-radius:12px;padding:13px;background:var(--peach)}.summary-box:nth-child(2){background:var(--mint)}.summary-box b{display:block;font-size:23px;letter-spacing:-1px}.summary-box small{font-size:11px;color:#45414b;font-weight:750}.audit-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-bottom:1px solid #e9e5ec;padding:8px 0}.audit-row:last-child{border:0}.audit-row b{font-size:12px}.audit-row small{display:block;font-size:10px;color:#7b747e;margin-top:3px}.badge-source{display:inline-block;font-size:9px;font-weight:900;padding:3px 5px;background:var(--lemon);border:1px solid #222;border-radius:5px}.pill-text{font-size:11px;line-height:1.55;color:#68606c}.smart-caption{font-size:11px;color:#6a6371;line-height:1.55}.smart-caption b{color:var(--ink)}
+@media(max-width:365px){.smart-actions{gap:8px}.smart-trigger{font-size:11px;padding:7px}.smart-trigger .big{font-size:22px}.assist-grid{gap:9px}}
+@media print{#screen-smart,.smart-actions{display:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="main">
+    <header class="top">
+      <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M5 10.5h14M9 6v2M9 14v3"/></svg></span><span>поличка<span class="brand-dot">.</span></span></div>
+      <button type="button" class="top-right" id="header-qr" aria-label="Відкрити QR-код"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM15 14v3m3-3h3v3m-7 4h3m4-2v2m-4-3h2" stroke-linejoin="round"/></svg><span>Мій QR</span></button>
+    </header>
+
+    <section id="screen-stock" class="section active" aria-label="Запаси">
+      <div class="home-intro"><p class="eyebrow" id="today-label">Ваші продукти</p><h1 class="page-title">Усе під<br><span class="title-accent">контролем.</span></h1><p class="intro">Знаєш, що є вдома. Купуєш тільки потрібне.</p></div>
+      <div class="hero"><div class="hero-top"><div><p class="hero-label">Зараз у холодильнику</p><div class="hero-number"><span id="hero-count">0</span><span class="hero-measure">продуктів</span></div><div class="hero-unit" id="hero-unit">найменувань у списку</div></div><span class="hero-illustration" aria-hidden="true">❋</span></div><div class="hero-stats"><button class="mini-stat" id="hero-shopping-shortcut" type="button"><span class="mini-symbol">↗</span><span><b id="hero-need">0</b> докупити</span><span class="stat-arrow">→</span></button><button class="mini-stat" id="hero-expiry-shortcut" type="button"><span class="mini-symbol">◷</span><span><b id="hero-expiry">0</b> скоро спливе</span><span class="stat-arrow">→</span></button></div></div>
+      <div class="home-actions"><button type="button" class="action-add" id="home-add"><span class="action-icon">＋</span><span>Додати продукт</span><span class="action-arrow">↗</span></button><button type="button" class="action-cart" id="home-shopping" aria-label="Відкрити покупки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M3 5h2l2.6 11h10.5l2.1-8H6M9 20h.01M17 20h.01" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="smart-actions"><button class="smart-trigger" id="home-barcode" type="button"><span class="big">▥</span><span>Сканувати<br>штрихкод</span></button><button class="smart-trigger" id="home-receipt" type="button"><span class="big">▤</span><span>Зчитати<br>чек</span></button></div>
+      <div class="between folders-title"><h2 class="section-heading">Мої полиці <span class="section-doodle">✳</span></h2><span class="subtle-hint">Обери категорію</span></div>
+      <div class="folder-grid" id="folder-grid" aria-label="Категорії продуктів">
+        <button type="button" class="folder-card all selected" data-folder="all"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">▦</span><span class="folder-count" data-folder-count="all">0</span></span><span class="folder-name">Усі продукти</span><span class="folder-arrow">↗</span></button>
+        <button type="button" class="folder-card dairy" data-folder="dairy"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🥛</span><span class="folder-count" data-folder-count="dairy">0</span></span><span class="folder-name">Молочне</span><span class="folder-arrow">↗</span></button>
+        <button type="button" class="folder-card fruit" data-folder="fruit"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🥑</span><span class="folder-count" data-folder-count="fruit">0</span></span><span class="folder-name">Овочі та фрукти</span><span class="folder-arrow">↗</span></button>
+        <button type="button" class="folder-card meat" data-folder="meat"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🍗</span><span class="folder-count" data-folder-count="meat">0</span></span><span class="folder-name">М’ясо та риба</span><span class="folder-arrow">↗</span></button>
+        <button type="button" class="folder-card bakery" data-folder="bakery"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🥐</span><span class="folder-count" data-folder-count="bakery">0</span></span><span class="folder-name">Хліб та випічка</span><span class="folder-arrow">↗</span></button>
+        <button type="button" class="folder-card other" data-folder="other"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🫙</span><span class="folder-count" data-folder-count="other">0</span></span><span class="folder-name">Інше</span><span class="folder-arrow">↗</span></button>
+      </div>
+      <div class="between fast-title"><h2 class="section-heading">Додати за секунду</h2><span class="subtle-hint">Швидкі кнопки</span></div>
+      <div class="quick-list"><button type="button" class="quick-food" data-quick="milk"><span>🥛</span> Молоко <b>+</b></button><button type="button" class="quick-food" data-quick="eggs"><span>🥚</span> Яйця <b>+</b></button><button type="button" class="quick-food" data-quick="bread"><span>🍞</span> Хліб <b>+</b></button></div>
+      <div class="demo" id="demo-banner" hidden><div style="font-size:21px">✦</div><div style="flex:1"><div class="tiny">ПРИКЛАД ЗАПОВНЕННЯ</div><p>Це тестові продукти для знайомства.</p></div><button type="button" id="clear-demo">Очистити</button></div>
+      <div class="between inventory-title"><h2 class="section-heading">Продукти <span id="inventory-label">· усі</span></h2><button type="button" class="text-btn" id="open-add-top">+ Додати</button></div>
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><input id="search-products" placeholder="Знайти продукт..." autocomplete="off" aria-label="Пошук продукту" /></label>
+      <div class="chips" id="filters" aria-label="Фільтри списку"><button class="chip active" data-filter="all">Усе</button><button class="chip" data-filter="dairy">Молочне</button><button class="chip" data-filter="fruit">Овочі і фрукти</button><button class="chip" data-filter="meat">М'ясо</button><button class="chip" data-filter="bakery">Хліб</button><button class="chip" data-filter="other">Інше</button></div>
+      <div class="list" id="stock-list"></div>
+      <button class="action-wide" type="button" id="open-add-bottom"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg> Додати продукт</button>
+    </section>
+
+    <section id="screen-shopping" class="section" aria-label="Покупки">
+      <p class="eyebrow">Для наступного походу в магазин</p><h1 class="page-title">Список покупок.</h1><p class="intro">Додаток сам підкаже, що закінчується, — а ти можеш додати щось своє.</p>
+      <div class="shopping-hero"><span class="shopping-splash">✳</span><span class="hero-label">У твоєму списку</span><div class="hero-number" id="shopping-total">0</div><div class="hero-unit">позицій до покупки</div><button class="copy-shopping" type="button" id="copy-shopping">Скопіювати список <span>↗</span></button></div>
+      <div class="subbar">Треба поповнити <span>автоматично</span></div><div class="list" id="auto-shopping"></div>
+      <div class="subbar">Особистий список <span>вручну</span></div><div class="list" id="manual-shopping"></div>
+      <form class="inline-form" id="shopping-form"><input name="shoppingName" maxlength="65" required placeholder="Що ще купити?" aria-label="Що купити"/><button type="submit">Додати</button></form>
+      <p class="notice">Відміть куплене галочкою. Продукти з автоматичного списку одразу поповняться до бажаної кількості.</p>
+    </section>
+
+    <section id="screen-plan" class="section" aria-label="Планування">
+      <p class="eyebrow">Менше харчових відходів</p><h1 class="page-title">З’їж вчасно.<br><span class="title-accent">Не викидай.</span></h1><p class="intro">Продукти, які скоро закінчать свій термін придатності.</p>
+      <div class="subbar" style="margin-top:28px">Термін спливає протягом 7 днів</div><div class="list" id="expiry-list"></div>
+      <div class="tip"><div class="tip-icon">✳</div><div><strong>Маленька звичка — велика економія</strong><p>Перед магазином подивись, що вже є вдома. Продукти з найближчим терміном використай першими.</p></div></div>
+      <div class="subbar">Продукти без зазначеної дати</div><div class="list" id="no-expiry-list"></div>
+    </section>
+
+    <section id="screen-smart" class="section" aria-label="Розумний помічник">
+      <p class="eyebrow">Безкоштовні інструменти</p><h1 class="page-title">Розумна<br><span class="title-accent">Поличка.</span></h1><p class="intro">Покупки, чеки, рецепти та статистика. Базові функції працюють без платного ШІ.</p>
+      <div class="assist-grid">
+        <button class="assist-tile" id="smart-barcode"><span class="glyph">▥</span><strong>Штрихкод</strong><small>Камера або ручний ввід</small></button>
+        <button class="assist-tile" id="smart-receipt"><span class="glyph">▤</span><strong>Зчитати чек</strong><small>Розпізнавання на телефоні</small></button>
+        <button class="assist-tile" id="smart-expiry"><span class="glyph">◷</span><strong>Знайти дату</strong><small>Фото упаковки та OCR</small></button>
+        <button class="assist-tile" id="smart-recipes"><span class="glyph">♨</span><strong>Що приготувати</strong><small>Рецепти з твоїх продуктів</small></button>
+      </div>
+      <div class="smart-panel"><div class="between"><h3>Що варто зробити</h3><span class="badge-source">АВТО</span></div><div id="smart-insights"></div></div>
+      <div class="smart-panel" id="recipes-anchor"><div class="between"><h3>Ідеї на вечерю</h3><button class="text-btn" id="refresh-recipes" type="button">Оновити ↗</button></div><div class="recipe-list" id="recipe-list"></div><p class="smart-caption">Це підбір за назвами продуктів, не перевірка реальної придатності чи безпеки їжі.</p></div>
+      <div class="smart-panel"><h3>Спитай Поличку ✳</h3><p>Можна використати NVIDIA NIM через захищену функцію Vercel. Без ключа працює локальний підбір рецептів вище.</p><label class="field-label" for="ai-question">Твоє питання</label><textarea class="smart-input" id="ai-question" rows="3" style="height:87px;resize:vertical" maxlength="450" placeholder="Що приготувати на вечерю без походу в магазин?"></textarea><button class="primary" type="button" id="ask-ai">Отримати пораду</button><div id="ai-response" class="smart-output" hidden></div><p class="smart-caption">ШІ доступний лише після налаштування NVIDIA та авторизованого Telegram-входу; не надсилай сюди особисті дані.</p></div>
+      <div class="smart-panel"><h3>Витрати та покупки</h3><div class="summary-grid"><div class="summary-box"><small>За чеками (30 днів)</small><b id="spent-30">0 €</b></div><div class="summary-box"><small>Чеків у базі</small><b id="receipts-count">0</b></div></div><label class="field-label" for="monthly-budget">Бюджет продуктів на місяць, €</label><div class="smart-row"><input class="smart-input" id="monthly-budget" type="number" min="0" max="100000" step="1" value="200"><button class="outline-small" type="button" id="save-budget">Зберегти</button></div><p id="budget-hint" class="smart-caption"></p></div>
+      <div class="smart-panel"><div class="between"><h3>Останні дії</h3><button type="button" class="text-btn" id="clear-history">Очистити</button></div><div id="audit-list" class="audit-list"></div></div>
+      <div class="smart-panel"><h3>Про збереження даних</h3><p>Зараз усе зберігається на цьому пристрої. QR відкриває додаток, але не синхронізує запаси. Для спільного холодильника потрібна база та авторизація.</p></div>
+    </section>
+
+    <section id="screen-qr" class="section" aria-label="QR-код і дані">
+      <p class="eyebrow">Швидкий доступ</p><h1 class="page-title">Скануй.<br><span class="title-accent">І готово!</span></h1><p class="intro">Роздрукуй код і наклей на дверцята — телефон відкриватиме сторінку додатка.</p>
+      <div id="printable" class="qr-panel"><div class="qr-frame" id="qr-image"><div class="placeholder">▦</div></div><h3>Наш холодильник</h3><p id="qr-caption">Після публікації додатка в інтернеті введи його адресу нижче.</p></div>
+      <div class="qr-form"><label for="qr-url" class="field-label">Посилання на опублікований додаток</label><input class="field" id="qr-url" type="url" placeholder="https://мій-додаток.example" inputmode="url" spellcheck="false"/><button id="make-qr" class="primary" type="button">Створити QR-код</button><div class="secondary-actions"><button id="print-qr" type="button" disabled>Роздрукувати</button><button id="copy-link" type="button" disabled>Скопіювати посилання</button></div></div>
+      <div class="qr-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 9v5m0 3v1"/></svg><p><b>Важливо:</b> зараз дані зберігаються лише в браузері цього пристрою. QR-код відкриває додаток, але спільні запаси між різними телефонами потребують серверної синхронізації.</p></div>
+      <div class="data-section"><div class="subbar">Резервна копія</div><div class="data-tools"><button id="export-data" type="button">Зберегти дані</button><button id="import-data" type="button">Відновити з файлу</button><input id="import-file" type="file" accept=".json,application/json" hidden/></div><p class="notice">Резервна копія містить усі продукти й покупки. Вона не замінює синхронізацію.</p><button class="danger-btn" id="clear-all" type="button">Очистити всі записи на цьому пристрої</button></div>
+    </section>
+  </main>
+  <nav class="nav" aria-label="Основне меню">
+    <button data-tab="stock" class="active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M5 10.5h14M9 6v2M9 14v3"/></svg>Запаси</button>
+    <button data-tab="shopping"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9h18l-2 12H5L3 9ZM8 9l4-7 4 7M8 13v4M12 13v4M16 13v4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="count-badge" id="nav-count" hidden>0</span>Покупки</button>
+    <button data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 11h18M8 15h3M8 18h5" stroke-linecap="round"/></svg>Терміни</button>
+    <button data-tab="smart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/></svg>Помічник</button>
+    <button data-tab="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM15 14v3m3-3h3v3m-7 4h3m4-2v2m-4-3h2" stroke-linejoin="round"/></svg>QR-код</button>
+  </nav>
+</div>
+<dialog id="product-dialog" aria-labelledby="dialog-title"><div class="sheet"><div class="sheet-header"><h2 id="dialog-title">Новий продукт</h2><button class="close" id="close-dialog" aria-label="Закрити" type="button">×</button></div><form id="product-form"><div class="form-grid"><div class="form-group full"><label for="f-name">Назва продукту</label><input id="f-name" required maxlength="65" placeholder="Наприклад, молоко" autocomplete="off"/></div><div class="form-group full"><label for="f-category">Категорія</label><select id="f-category"><option value="dairy">Молочне</option><option value="fruit">Овочі і фрукти</option><option value="meat">М'ясо та риба</option><option value="bakery">Хліб і випічка</option><option value="other">Інше</option></select></div><div class="form-group"><label for="f-qty">Зараз є</label><input id="f-qty" type="number" min="0" max="100000" step="any" required value="1"/></div><div class="form-group"><label for="f-unit">Одиниця виміру</label><select id="f-unit"><option value="шт">шт</option><option value="уп.">уп.</option><option value="л">л</option><option value="кг">кг</option><option value="г">г</option></select></div><div class="form-group"><label for="f-min">Коли нагадати купити</label><input id="f-min" type="number" min="0" max="100000" step="any" required value="1"/><p class="form-help">Додати у покупки, коли залишиться стільки або менше.</p></div><div class="form-group"><label for="f-target">Скільки хочеш мати</label><input id="f-target" type="number" min="0.01" max="100000" step="any" required value="3"/><p class="form-help">До цього рівня поповнимо запас після покупки.</p></div><div class="form-group full"><label for="f-expiry">Придатний до (необов'язково)</label><input id="f-expiry" type="date"/></div>
+      <div class="form-group"><label for="f-price">Ціна за одиницю, €</label><input id="f-price" type="number" step="0.01" min="0" max="100000" placeholder="0.00"/></div>
+      <div class="form-group"><label for="f-place">Де зберігається</label><select id="f-place"><option value="fridge">Холодильник</option><option value="freezer">Морозилка</option><option value="pantry">Комора</option></select></div>
+      <div class="form-group full"><label for="f-barcode">Штрихкод (необов'язково)</label><input id="f-barcode" type="text" inputmode="numeric" maxlength="22" placeholder="EAN / GTIN" /></div>
+      <div class="form-group full"><label for="f-note">Нотатка</label><input id="f-note" maxlength="120" placeholder="Наприклад, відкрите сьогодні" /></div></div><p class="form-error" id="form-error" role="alert"></p><button class="primary" type="submit">Зберегти продукт</button><button class="danger-btn" id="delete-product" type="button" hidden>Видалити цей продукт</button></form></div></dialog>
+<dialog id="scan-dialog" aria-labelledby="scan-title"><div class="sheet"><div class="sheet-header"><h2 id="scan-title">Сканер</h2><button type="button" id="close-scan" class="close" aria-label="Закрити">×</button></div><p id="scan-hint" class="smart-note">Відскануй упаковку або введи код вручну.</p><div id="barcode-content"><div id="scan-reader" class="scan-area">Камера не запущена</div><div class="smart-row"><button class="outline-small" type="button" id="start-camera">Увімкнути камеру</button><button class="outline-small" type="button" id="stop-camera">Зупинити</button></div><label class="field-label" for="barcode-input">Код товару</label><div class="smart-row"><input id="barcode-input" class="smart-input" type="text" inputmode="numeric" maxlength="22" placeholder="Наприклад 3017620422003"/><button class="outline-small" id="lookup-barcode" type="button">Знайти</button></div><p class="smart-note" id="barcode-status"></p></div><div id="ocr-content" hidden><label class="field-label" for="ocr-file">Зроби фото або вибери з галереї</label><input class="smart-input" id="ocr-file" type="file" accept="image/*" capture="environment"/><p class="smart-note" id="ocr-status">Обробка відбувається локально на твоєму пристрої. Перший запуск завантажує OCR-модель.</p><div id="ocr-preview" hidden><div id="ocr-dates" class="smart-output" hidden></div><div id="receipt-preview-wrap"><p class="smart-note">Перевір знайдені позиції, відредагуй назви та ціни. Зайве зніми галочкою.</p><div id="receipt-rows" class="receipt-table"></div><button class="outline-small" id="add-receipt-row" type="button">+ Додати рядок</button><div class="smart-row"><input class="smart-input" id="receipt-store" type="text" maxlength="60" placeholder="Магазин (необов'язково)"/><input class="smart-input" id="receipt-total" type="number" min="0" max="100000" step="0.01" placeholder="Сума €"/></div><button class="primary" id="import-receipt" type="button">Додати обрані продукти</button></div></div></div></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- QR generator: Kazuhiko Arase's MIT-licensed QRCode implementation, bundled below. -->
+<script>
+/* MIT QRCode for JavaScript, Kazuhiko Arase. */
+(function(){
+const modules={}; const cache={};
+function req(name){const key=name.replace(/^\.\//, ""); if(!modules[key])throw new Error("QR module "+key); if(!cache[key]){const m={exports:{}};cache[key]=m;modules[key](m,m.exports,req);} return cache[key].exports;}
+modules['QR8bitByte']=function(module,exports,require){
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+};
+modules['QRBitBuffer']=function(module,exports,require){
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+};
+modules['QRErrorCorrectLevel']=function(module,exports,require){
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+};
+modules['QRMaskPattern']=function(module,exports,require){
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+};
+modules['QRMath']=function(module,exports,require){
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+};
+modules['QRMode']=function(module,exports,require){
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+};
+modules['QRPolynomial']=function(module,exports,require){
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+};
+modules['QRRSBlock']=function(module,exports,require){
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+};
+modules['QRUtil']=function(module,exports,require){
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+};
+modules['index']=function(module,exports,require){
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//   http://www.opensource.org/licenses/mit-license.php
+//
+// The word "QR Code" is registered trademark of 
+// DENSO WAVE INCORPORATED
+//   http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+};
+window.InlineQRCode=req('index');
+})();
+</script>
+<script>
+(() => { 'use strict';
+  const STORAGE_KEY = 'fridgebook_v1'; const URL_KEY = 'fridgebook_public_url_v1';
+  const CATS={dairy:{label:'Молочне',emoji:'🥛'},fruit:{label:'Овочі і фрукти',emoji:'🥬'},meat:{label:'М’ясо та риба',emoji:'🍗'},bakery:{label:'Хліб і випічка',emoji:'🥖'},other:{label:'Інше',emoji:'🫙'}};
+  const $ = s=>document.querySelector(s); const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const nowLocal = ()=> {const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate());};
+  const dateAhead = d => {const n=nowLocal();n.setDate(n.getDate()+d);return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;};
+  const uid=()=> {if (globalThis.crypto?.randomUUID) return crypto.randomUUID(); return `${Date.now()}_${Math.random().toString(36).slice(2)}`;};
+  const demo=()=>({version:1,demo:true,items:[
+    {id:uid(),name:'Яйця',category:'other',qty:6,unit:'шт',min:4,target:12,expiry:dateAhead(10)},
+    {id:uid(),name:'Молоко',category:'dairy',qty:1,unit:'л',min:1,target:3,expiry:dateAhead(5)},
+    {id:uid(),name:'Помідори',category:'fruit',qty:3,unit:'шт',min:2,target:6,expiry:dateAhead(6)},
+    {id:uid(),name:'Твердий сир',category:'dairy',qty:.2,unit:'кг',min:.2,target:.6,expiry:dateAhead(12)},
+    {id:uid(),name:'Йогурт',category:'dairy',qty:2,unit:'шт',min:2,target:4,expiry:dateAhead(2)},
+    {id:uid(),name:'Масло',category:'dairy',qty:1,unit:'уп.',min:0,target:2,expiry:dateAhead(28)},
+    {id:uid(),name:'Огірки',category:'fruit',qty:0,unit:'шт',min:2,target:5,expiry:dateAhead(3)},
+    {id:uid(),name:'Куряче філе',category:'meat',qty:.5,unit:'кг',min:.3,target:1,expiry:dateAhead(1)}
+  ],shopping:[]});
+  function validateItem(x){
+    if (!x || typeof x!=='object' || !String(x.name||'').trim()) return null;
+    const number=(n,fallback)=>Number.isFinite(Number(n))?Math.max(0,Math.min(100000,Number(n))):fallback;
+    const min=number(x.min,0), target=Math.max(number(x.target,1),min,.01);
+    return {id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120)};
+  }
+  function normalize(raw){if(!raw||!Array.isArray(raw.items)||!Array.isArray(raw.shopping))throw Error('Неправильний формат');return {version:2,demo:!!raw.demo,items:raw.items.slice(0,600).map(validateItem).filter(Boolean),shopping:raw.shopping.slice(0,600).filter(i=>i&&String(i.name||'').trim()).map(i=>({id:String(i.id||uid()).slice(0,100),name:String(i.name).trim().slice(0,65)})),receipts:Array.isArray(raw.receipts)?raw.receipts.slice(-100).filter(x=>x&&Number.isFinite(Number(x.total))).map(x=>({id:String(x.id||uid()),date:String(x.date||''),store:String(x.store||'').slice(0,60),total:Math.max(0,Math.min(100000,Number(x.total)))})):[],events:Array.isArray(raw.events)?raw.events.slice(-100).filter(x=>x&&x.text).map(x=>({text:String(x.text).slice(0,150),at:String(x.at).slice(0,40)})):[],settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??200)||0))}};}
+  let state;try{const saved=localStorage.getItem(STORAGE_KEY);state=normalize(saved?JSON.parse(saved):demo());}catch(e){state=normalize(demo());}
+  let tab='stock', filter='all', editing=null, toastTimer;
+  const save=()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){showToast('Не вдалося зберегти дані на цьому пристрої');}};
+  function showToast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600);}
+  function precision(n){return Math.round((n+Number.EPSILON)*100)/100;}
+  function unitStep(item){return item.unit==='кг'?.1:item.unit==='л'?.5:item.unit==='г'?100:1;}
+  const fmt=n=>Number(n).toLocaleString('uk-UA',{maximumFractionDigits:2});
+  const daysLeft=s=>{if(!s)return null;const parsed=new Date(`${s}T00:00:00`);if(Number.isNaN(parsed.getTime()))return null;return Math.round((parsed-nowLocal())/86400000);};
+  function expirationText(i){const d=daysLeft(i.expiry);if(d===null)return '';if(d<0)return ['Термін минув','danger'];if(d===0)return ['Придатний до сьогодні','danger'];if(d===1)return ['Придатний ще 1 день','warn'];if(d<=3)return [`Залишилось ${d} дні`,'warn'];return [new Date(i.expiry+'T00:00:00').toLocaleDateString('uk-UA',{day:'numeric',month:'short'}),''];}
+  function low(i){return i.qty<=i.min && i.target>i.qty;}
+  function restock(){return state.items.filter(low);}
+  function emoji(i){const s=i.name.toLowerCase();if(/яйц/.test(s))return '🥚';if(/помід|томат/.test(s))return '🍅';if(/огір/.test(s))return '🥒';if(/сир/.test(s))return '🧀';if(/йогурт/.test(s))return '🥣';if(/масло|маслo/.test(s))return '🧈';if(/молок/.test(s))return '🥛';if(/кур|філе/.test(s))return '🍗';if(/яблук/.test(s))return '🍎';if(/банан/.test(s))return '🍌';if(/хліб|батон/.test(s))return '🍞';return CATS[i.category].emoji;}
+  function productMarkup(i){const e=expirationText(i);const badge=i.qty===0?['Закінчилося','danger']:low(i)?['Потрібно докупити','warn']:e?.length&&daysLeft(i.expiry)<=3?e:null;
+    return `<article class="item"><div class="food-icon ${i.category}" aria-hidden="true">${emoji(i)}</div><div class="item-copy"><button class="item-name" data-action="edit" data-id="${esc(i.id)}" title="Редагувати">${esc(i.name)}</button><div class="item-sub">${esc(CATS[i.category].label)}${i.expiry?'<span class="dot"></span>'+esc(e[0]):''}</div>${badge?`<span class="status ${badge[1]}">${esc(badge[0])}</span>`:''}</div><div class="quantity"><button type="button" data-action="decrease" data-id="${esc(i.id)}" aria-label="Зменшити ${esc(i.name)}" ${i.qty<=0?'disabled':''}>−</button><span class="quantity-val">${fmt(i.qty)}<small>${esc(i.unit)}</small></span><button class="plus" type="button" data-action="increase" data-id="${esc(i.id)}" aria-label="Збільшити ${esc(i.name)}">+</button></div></article>`;
+  }
+  function renderStock(){let items=state.items.filter(i=>(filter==='all'||i.category===filter)&&i.name.toLowerCase().includes($('#search-products').value.trim().toLowerCase()));items.sort((a,b)=>Number(low(b))-Number(low(a)) || Number(a.qty===0)-Number(b.qty===0) || a.name.localeCompare(b.name,'uk'));
+    $('#stock-list').innerHTML=items.length?items.map(productMarkup).join(''):`<div class="empty"><div class="empty-illustration">🥬</div><b>Тут поки порожньо</b><p>${state.items.length?'За цим пошуком продуктів немає.':'Додай свій перший продукт — і починай вести запаси.'}</p></div>`;
+    $('#demo-banner').hidden=!state.demo; document.querySelectorAll('[data-folder-count]').forEach(e=>{const cat=e.dataset.folderCount;e.textContent=state.items.filter(i=>cat==='all'||i.category===cat).length;});document.querySelectorAll('[data-folder]').forEach(b=>{const selected=b.dataset.folder===filter;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});$('#inventory-label').textContent='· '+(filter==='all'?'усі':CATS[filter].label.toLowerCase());$('#hero-count').textContent=state.items.filter(i=>i.qty>0).length;$('#hero-unit').textContent=`із ${state.items.length} найменувань у списку`;$('#hero-need').textContent=restock().length;$('#hero-expiry').textContent=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=3).length;
+    [...$('#filters').children].forEach(b=>{b.classList.toggle('active',b.dataset.filter===filter);b.setAttribute('aria-pressed',b.dataset.filter===filter?'true':'false');});
+  }
+  function shoppingMarkupAuto(i){const need=precision(i.target-i.qty);return `<article class="buy-item"><button class="buy-check" type="button" data-action="bought" data-id="${esc(i.id)}" aria-label="Куплено: ${esc(i.name)}">✓</button><span class="buy-icon">${emoji(i)}</span><div class="buy-info"><b>${esc(i.name)}</b><p>Є: ${fmt(i.qty)} ${esc(i.unit)}</p></div><span class="pill">+${fmt(need)} ${esc(i.unit)}</span></article>`;}
+  function shoppingMarkupManual(i){return `<article class="buy-item"><button class="buy-check" type="button" data-action="manualBought" data-id="${esc(i.id)}" aria-label="Прибрати зі списку: ${esc(i.name)}">✓</button><div class="buy-info"><b>${esc(i.name)}</b><p>Додано вручну</p></div><span class="pill note">У списку</span></article>`;}
+  function renderShopping(){const automatic=restock(), manual=state.shopping;const count=automatic.length+manual.length;$('#shopping-total').textContent=count;$('#nav-count').textContent=count>99?'99+':count;$('#nav-count').hidden=count===0;
+    $('#auto-shopping').innerHTML=automatic.length?automatic.map(shoppingMarkupAuto).join(''):`<div class="empty"><div class="empty-illustration">✓</div><b>Запасів достатньо</b><p>Автоматичний список поки порожній.</p></div>`;
+    $('#manual-shopping').innerHTML=manual.length?manual.map(shoppingMarkupManual).join(''):`<div class="empty" style="padding:21px 12px"><b>Поки нічого немає</b><p>Додай покупку у полі нижче.</p></div>`;
+  }
+  function renderPlan(){const items=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=7).sort((a,b)=>daysLeft(a.expiry)-daysLeft(b.expiry));
+    $('#expiry-list').innerHTML=items.length?items.map(i=>{const d=daysLeft(i.expiry),dt=new Date(i.expiry+'T00:00:00');return `<article class="expiry-card ${d<=3?'urgent':''}"><div class="expiry-date"><b>${dt.getDate()}</b><small>${dt.toLocaleDateString('uk-UA',{month:'short'})}</small></div><div class="expiry-detail"><b>${esc(i.name)}</b><p>${d<0?'Термін уже минув':d===0?'Останній день':d===1?'Залишився 1 день':`Залишилося ${d} днів`} · ${fmt(i.qty)} ${esc(i.unit)}</p></div><span>${d<=1?'⚠️':'🍃'}</span></article>`;}).join(''):`<div class="empty"><div class="empty-illustration">🌿</div><b>Нічого термінового</b><p>Немає продуктів із зазначеним терміном, що спливає за 7 днів.</p></div>`;
+    const unknown=state.items.filter(i=>i.qty>0&&!i.expiry);$('#no-expiry-list').innerHTML=unknown.length?unknown.map(i=>`<article class="buy-item"><span class="buy-icon">${emoji(i)}</span><div class="buy-info"><b>${esc(i.name)}</b><p>${fmt(i.qty)} ${esc(i.unit)} · дата не вказана</p></div><button type="button" class="text-btn" data-action="edit" data-id="${esc(i.id)}">Додати дату</button></article>`).join(''):`<p class="notice">У всіх наявних продуктів зазначено дату або список порожній.</p>`;
+  }
+  function render(){renderStock();renderShopping();renderPlan();renderSmart();}
+  function setTab(name){if(!['stock','shopping','plan','smart','qr'].includes(name))return;tab=name;document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='screen-'+tab));document.querySelectorAll('[data-tab]').forEach(b=>{const yes=b.dataset.tab===tab;b.classList.toggle('active',yes);b.setAttribute('aria-current',yes?'page':'false');});window.scrollTo({top:0,behavior:'instant'});}
+  function openForm(item){editing=item?.id||null;$('#dialog-title').textContent=item?'Редагувати продукт':'Новий продукт';$('#f-name').value=item?.name||'';$('#f-category').value=item?.category||'dairy';$('#f-qty').value=item?.qty??1;$('#f-unit').value=item?.unit||'шт';$('#f-min').value=item?.min??1;$('#f-target').value=item?.target??3;$('#f-expiry').value=item?.expiry||'';$('#f-price').value=item?.price||'';$('#f-place').value=item?.place||'fridge';$('#f-barcode').value=item?.barcode||'';$('#f-note').value=item?.note||'';$('#form-error').textContent='';$('#delete-product').hidden=!editing;$('#product-dialog').showModal();}
+  function changeQty(item,dir){item.qty=precision(Math.max(0,item.qty+dir*unitStep(item)));logAction(`${dir>0?'+':'−'} ${item.name}: ${fmt(item.qty)} ${item.unit}`);state.demo=false;save();render();}
+  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+  $('#header-qr').addEventListener('click',()=>setTab('qr'));
+  $('#hero-shopping-shortcut').addEventListener('click',()=>setTab('shopping'));
+  $('#hero-expiry-shortcut').addEventListener('click',()=>setTab('plan'));
+  $('#home-shopping').addEventListener('click',()=>setTab('shopping'));
+  $('#home-add').addEventListener('click',()=>openForm());
+  $('#folder-grid').addEventListener('click',e=>{const b=e.target.closest('[data-folder]');if(!b)return;filter=b.dataset.folder;renderStock();document.querySelector('.inventory-title').scrollIntoView({behavior:'smooth',block:'start'});});
+  const quickPresets={milk:{name:'Молоко',category:'dairy',unit:'л',qty:1,min:1,target:3},eggs:{name:'Яйця',category:'other',unit:'шт',qty:6,min:4,target:12},bread:{name:'Хліб',category:'bakery',unit:'шт',qty:1,min:1,target:2}};
+  document.querySelectorAll('[data-quick]').forEach(b=>b.addEventListener('click',()=>{const p=quickPresets[b.dataset.quick];const found=state.items.find(i=>i.name.toLowerCase()===p.name.toLowerCase()&&i.unit===p.unit);if(found){found.qty=precision(found.qty+p.qty);}else{state.items.unshift({...p,id:uid(),expiry:''});}state.demo=false;save();render();showToast(found?'Запас поповнено':'Продукт додано до запасів');}));
+  $('#copy-shopping').addEventListener('click',async()=>{const entries=[...restock().map(i=>`${i.name} — ${fmt(precision(i.target-i.qty))} ${i.unit}`),...state.shopping.map(i=>i.name)];if(!entries.length){showToast('Список покупок порожній');return;}const val='🛒 Список покупок\n'+entries.map(i=>'• '+i).join('\n');try{await navigator.clipboard.writeText(val);showToast('Список скопійовано');}catch(e){const t=document.createElement('textarea');t.value=val;t.style.position='fixed';t.style.opacity='0';document.body.append(t);t.select();const ok=document.execCommand('copy');t.remove();showToast(ok?'Список скопійовано':'Не вдалося скопіювати');}});
+  // Telegram Mini App UI hooks; secure multi-user state requires a separate backend.
+  const tg=window.Telegram?.WebApp;
+  if(tg){try{tg.ready();tg.expand();tg.setHeaderColor?.('#fffdf8');tg.setBackgroundColor?.('#fffdf8');document.documentElement.classList.add('telegram-app');document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>tg.HapticFeedback?.selectionChanged?.(),{passive:true}));}catch(e){}}
+
+  $('#filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;filter=b.dataset.filter;renderStock();});
+  $('#search-products').addEventListener('input',renderStock);
+  $('#open-add-top').addEventListener('click',()=>openForm());$('#open-add-bottom').addEventListener('click',()=>openForm());
+  $('#close-dialog').addEventListener('click',()=>$('#product-dialog').close());$('#product-dialog').addEventListener('click',e=>{if(e.target===$('#product-dialog'))$('#product-dialog').close();});
+  $('#product-form').addEventListener('submit',e=>{e.preventDefault();const i=validateItem({id:editing||uid(),name:$('#f-name').value,category:$('#f-category').value,qty:$('#f-qty').value,unit:$('#f-unit').value,min:$('#f-min').value,target:$('#f-target').value,expiry:$('#f-expiry').value,price:$('#f-price').value,place:$('#f-place').value,barcode:$('#f-barcode').value,note:$('#f-note').value});if(!i){$('#form-error').textContent='Введи назву продукту';return;}if(!Number.isFinite(Number($('#f-qty').value))||!Number.isFinite(Number($('#f-min').value))||!Number.isFinite(Number($('#f-target').value))||Number($('#f-qty').value)<0||Number($('#f-min').value)<0||Number($('#f-target').value)<=0){$('#form-error').textContent='Перевір кількість і пороги запасу';return;}if(i.target<=i.min){$('#form-error').textContent='Бажаний запас має бути більшим за поріг нагадування';return;}
+    if(editing){const at=state.items.findIndex(x=>x.id===editing);if(at>=0)state.items[at]=i;}else state.items.unshift(i);logAction(`${editing?'Змінено':'Додано'}: ${i.name}`);state.demo=false;save();render();$('#product-dialog').close();showToast(editing?'Зміни збережено':'Продукт додано');});
+  $('#delete-product').addEventListener('click',()=>{if(!editing)return;const i=state.items.find(i=>i.id===editing);if(!i)return;if(!confirm(`Видалити «${i.name}» із холодильника?`))return;state.items=state.items.filter(i=>i.id!==editing);logAction(`Видалено: ${i.name}`);state.demo=false;save();render();$('#product-dialog').close();showToast('Продукт видалено');});
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const id=b.dataset.id,act=b.dataset.action;if(act==='manualBought'){state.shopping=state.shopping.filter(i=>i.id!==id);state.demo=false;save();render();showToast('Покупку викреслено');return;}const i=state.items.find(x=>x.id===id);if(!i)return;if(act==='edit'){openForm(i);return;}if(act==='increase')changeQty(i,1);if(act==='decrease')changeQty(i,-1);if(act==='bought'){i.qty=i.target;logAction(`Куплено: ${i.name}`);state.demo=false;save();render();showToast('Запас поповнено');}});
+  $('#shopping-form').addEventListener('submit',e=>{e.preventDefault();const f=e.currentTarget;const name=f.elements.shoppingName.value.trim();if(!name)return;state.shopping.push({id:uid(),name:name.slice(0,65)});state.demo=false;save();render();f.reset();showToast('Додано до покупок');});
+  function clearAll(){state=normalize({version:2,demo:false,items:[],shopping:[]});save();render();showToast('Усі записи на цьому пристрої очищено');}
+  $('#clear-demo').addEventListener('click',()=>{if(!confirm('Прибрати всі демонстраційні продукти?'))return;clearAll();});
+  $('#clear-all').addEventListener('click',()=>{if(!confirm('Це видалить усі продукти та покупки на цьому пристрої. Продовжити?'))return;clearAll();});
+  $('#today-label').textContent=new Date().toLocaleDateString('uk-UA',{weekday:'long',day:'numeric',month:'long'});
+  $('#export-data').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`holodylnyk-${dateAhead(0)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('Резервну копію створено');});
+  $('#import-data').addEventListener('click',()=>$('#import-file').click());$('#import-file').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>2_000_000)throw Error('Файл завеликий');const restored=normalize(JSON.parse(await file.text()));if(!confirm('Замінити поточні дані на дані з резервної копії?'))return;state=restored;save();render();showToast('Дані відновлено');}catch(e){showToast('Не вдалося прочитати файл із даними');}finally{e.target.value='';}});
+  function validLink(raw){try{const url=new URL(raw);if(!['https:','http:'].includes(url.protocol)||url.username||url.password||!url.hostname||url.hostname==='example'||url.hostname.endsWith('.example'))return null;return url.href;}catch(e){return null;}}
+  function makeQR(raw){const url=validLink(raw);if(!url){showToast('Введи справжнє посилання на сайт (https://…)');return;}try{const QR=window.InlineQRCode;if(!QR)throw Error('QR module unavailable');const qr=new QR(-1,1);qr.addData(url);qr.make();const n=qr.getModuleCount(),path=[];for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(qr.isDark(y,x))path.push(`M${x+4} ${y+4}h1v1h-1z`);$('#qr-image').innerHTML=`<svg viewBox="0 0 ${n+8} ${n+8}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR-код з адресою додатка"><rect width="${n+8}" height="${n+8}" fill="#ffffff"/><path d="${path.join('')}" fill="#171719"/></svg>`;$('#qr-caption').textContent=url;$('#copy-link').disabled=false;$('#print-qr').disabled=false;try{localStorage.setItem(URL_KEY,url);}catch(e){}showToast('QR-код готовий');}catch(e){showToast('Не вдалося створити QR-код');}}
+  $('#make-qr').addEventListener('click',()=>makeQR($('#qr-url').value.trim()));$('#print-qr').addEventListener('click',()=>window.print());$('#copy-link').addEventListener('click',async()=>{const u=$('#qr-caption').textContent;try{await navigator.clipboard.writeText(u);showToast('Посилання скопійовано');}catch(e){showToast('Скопіюй адресу із поля вище');}});
+  let savedUrl='';try{savedUrl=localStorage.getItem(URL_KEY)||'';}catch(e){}const suggestedUrl=savedUrl||((location.protocol==='https:'&&location.hostname)?location.origin+location.pathname:'');if(suggestedUrl){$('#qr-url').value=suggestedUrl;makeQR(suggestedUrl);}
+  if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  // Smart tools: local OCR, open product lookup, deterministic planning, spending, optional server AI.
+  const RECIPES = [
+    {name:'Омлет із сиром',icon:'🍳',mins:12,items:['яйця','сир','молоко']},
+    {name:'Салат із помідорів',icon:'🥗',mins:8,items:['помідори','огірки','сир']},
+    {name:'Сирні грінки',icon:'🥪',mins:10,items:['хліб','сир','масло']},
+    {name:'Курка з рисом',icon:'🍚',mins:35,items:['курка','рис','цибуля']},
+    {name:'Картопля з грибами',icon:'🥔',mins:35,items:['картопля','гриби','цибуля']},
+    {name:'Суп овочевий',icon:'🍲',mins:30,items:['картопля','морква','цибуля']},
+    {name:'Паста із томатами',icon:'🍝',mins:25,items:['макарони','помідори','сир']},
+    {name:'Млинці',icon:'🥞',mins:25,items:['яйця','молоко','борошно']},
+    {name:'Вівсянка з яблуком',icon:'🥣',mins:12,items:['вівсянка','молоко','яблука']},
+    {name:'Йогуртовий десерт',icon:'🍨',mins:5,items:['йогурт','банани','яблука']},
+    {name:'Рибний салат',icon:'🐟',mins:15,items:['риба','огірки','помідори']},
+    {name:'Гречка з овочами',icon:'🍛',mins:30,items:['гречка','морква','цибуля']},
+    {name:'Яєчний сендвіч',icon:'🥪',mins:14,items:['яйця','хліб','огірки']},
+    {name:'Картопляне пюре',icon:'🥔',mins:28,items:['картопля','молоко','масло']},
+    {name:'Овочева запіканка',icon:'🍽',mins:40,items:['картопля','сир','помідори']},
+    {name:'Швидкий суп з куркою',icon:'🍲',mins:35,items:['курка','морква','картопля']}
+  ];
+  const TERMS = {
+    'яйця':/яйц|eier|egg/i, 'сир':/сир|käse|kaese|cheese|mozzarella|gouda/i,
+    'молоко':/молок|milch|milk/i, 'помідори':/помід|томат|tomat/i,
+    'огірки':/огір|gurk|cucumber/i, 'масло':/масло|butter/i,
+    'хліб':/хліб|булк|батон|brot|bread|brötchen|toast/i,
+    'курка':/курк|курят|філе|hähn|huehn|chicken|poulet/i,
+    'рис':/рис|reis|rice/i, 'цибуля':/цибул|zwiebel|onion/i,
+    'картопля':/картоп|kartoff|potato/i, 'морква':/морк|karott|möhr|moehr/i,
+    'гриби':/гриб|pilz|champignon/i, 'макарони':/макарон|паст[аеи]|nudel|spaghetti|pasta/i,
+    'борошно':/борош|mehl|flour/i, 'вівсянка':/вівсян|hafer|oat/i,
+    'яблука':/яблук|apfel|äpfel|apple/i, 'банани':/банан|banan/i,
+    'йогурт':/йогур|joghurt|yoghurt|yogurt/i, 'риба':/риб|fisch|lachs|fish|salmon/i,
+    'гречка':/греч|buchweiz|buckwheat/i
+  };
+  const euro = n => `${Number(n||0).toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})} €`;
+  function logAction(t){
+    if(!Array.isArray(state.events))state.events=[];
+    state.events.push({text:String(t).slice(0,150),at:new Date().toISOString()});
+    if(state.events.length>100)state.events=state.events.slice(-100);
+  }
+  function identifyCategory(n){
+    if(/milch|молок|käse|kaese|сир|butter|масло|joghurt|йогур|quark|sahne/i.test(n))return 'dairy';
+    if(/tomat|помід|огір|gurk|kartoff|картоп|яблук|apfel|banan|морк|karott|овоч|fruit|obst|zwiebel/i.test(n))return 'fruit';
+    if(/fleisch|wurst|kurk|hähn|huehn|м.яс|риба|fisch|lachs|chicken/i.test(n))return 'meat';
+    if(/brot|хліб|bröt|toast|croissant|булк|backwar/i.test(n))return 'bakery';
+    return 'other';
+  }
+  function hasIngredient(term){return state.items.some(x=>x.qty>0 && TERMS[term]?.test(x.name));}
+  function ingredientUrgent(term){return state.items.some(x=>x.qty>0&&x.expiry&&daysLeft(x.expiry)<=3&&TERMS[term]?.test(x.name));}
+  function scoreRecipes(){return RECIPES.map((r,index)=>{
+    const available=r.items.filter(hasIngredient),missing=r.items.filter(x=>!hasIngredient(x));
+    return {...r,index,available,missing,score:available.length*10-missing.length*5+r.items.filter(ingredientUrgent).length*5};
+  }).sort((a,b)=>b.score-a.score||a.index-b.index);}
+  function renderRecipes(){
+    $('#recipe-list').innerHTML=scoreRecipes().slice(0,6).map(r=>`<article class="recipe"><div class="recipe-top"><span class="recipe-emoji">${r.icon}</span><div><strong>${esc(r.name)}</strong><br><small>◷ ${r.mins} хв · ${r.available.length}/${r.items.length} інгредієнтів удома</small></div></div><small>Є: ${esc(r.available.join(', ')||'нічого')}${r.missing.length?`<br>Докупити: ${esc(r.missing.join(', '))}`:''}</small><div class="recipe-actions"><span class="pill ${r.missing.length?'note':''}">${r.missing.length===0?'Усе є':'Не вистачає '+r.missing.length}</span><button type="button" data-recipe="${r.index}" ${r.missing.length===0?'disabled':''}>У покупки +</button></div></article>`).join('');
+  }
+  function renderSmart(){
+    const expiring=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=3);
+    const outdated=expiring.filter(i=>daysLeft(i.expiry)<0);
+    const lacking=restock();
+    const unknown=state.items.filter(i=>i.qty>0&&!i.expiry);
+    const messages=[];
+    if(outdated.length)messages.push(`⚠ ${outdated.length} продукт(ів) із минулим зазначеним терміном — перевір і виріши, чи безпечно використовувати.`);
+    if(expiring.length)messages.push(`◷ ${expiring.length} продукт(ів) потребують уваги до терміну зберігання.`);
+    if(lacking.length)messages.push(`↗ ${lacking.length} позицій уже у списку поповнення.`);
+    if(unknown.length)messages.push(`? ${unknown.length} позицій без дати придатності.`);
+    if(!messages.length)messages.push('✓ Запаси виглядають впорядковано. Перевіряй дати на упаковках.');
+    $('#smart-insights').innerHTML=messages.map(m=>`<p style="padding:7px 0;border-bottom:1px solid #eee9ed">${esc(m)}</p>`).join('');
+    const cutoff=new Date();cutoff.setDate(cutoff.getDate()-30);
+    const spent=(state.receipts||[]).filter(x=>new Date(x.date)>=cutoff).reduce((a,x)=>a+Number(x.total||0),0);
+    $('#spent-30').textContent=euro(spent);$('#receipts-count').textContent=(state.receipts||[]).length;
+    $('#monthly-budget').value=state.settings?.budget??200;
+    const budget=Number(state.settings?.budget||0);
+    $('#budget-hint').textContent=budget?`За останні 30 днів внесено чеків на ${euro(spent)} із бюджету ${euro(budget)} (${Math.round(spent/budget*100)}%). Підрахунок лише за відсканованими чеками.`:'Додай свій бюджет, щоб бачити співвідношення витрат.';
+    $('#audit-list').innerHTML=(state.events||[]).length?state.events.slice(-8).reverse().map(x=>`<div class="audit-row"><div><b>${esc(x.text)}</b><small>${new Date(x.at).toLocaleString('uk-UA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</small></div></div>`).join(''):'<p class="smart-caption">Історія з’явиться після додавання або зміни продуктів.</p>';
+    renderRecipes();
+  }
+  // Barcode scanning requires camera only when the user clicks Start.
+  let scanMode='barcode',barcodeScanner=null,ocrText='',receiptRows=[],ocrLastFile=null;
+  function openScan(mode){
+    scanMode=mode;$('#scan-dialog').showModal();
+    $('#barcode-content').hidden=mode!=='barcode';$('#ocr-content').hidden=mode==='barcode';
+    $('#scan-title').textContent=mode==='barcode'?'Сканувати штрихкод':mode==='expiry'?'Зчитати дату':'Зчитати чек';
+    $('#scan-hint').textContent=mode==='barcode'?'Введи код або увімкни камеру. Дані товарів шукаємо у відкритій базі.':mode==='expiry'?'Вибери фото дати на упаковці. Перевір результат вручну.':'Вибери чітке фото чека. Перед додаванням перевір назви, ціни та кількість.';
+    $('#ocr-preview').hidden=true;$('#ocr-file').value='';
+    $('#barcode-status').textContent='';
+  }
+  function closeScan(){stopCamera();$('#scan-dialog').close();}
+  function lazyScript(src,globalName){return new Promise((resolve,reject)=>{
+    if(window[globalName]){resolve(window[globalName]);return;}
+    const el=document.createElement('script');el.src=src;el.async=true;el.onload=()=>window[globalName]?resolve(window[globalName]):reject(Error('Бібліотеку не знайдено'));el.onerror=()=>reject(Error('Не вдалося завантажити модуль. Перевір інтернет.'));document.head.append(el);
+  });}
+  async function startCamera(){
+    const status=$('#barcode-status');status.textContent='Завантажуємо модуль камери…';
+    try{
+      if(!navigator.mediaDevices?.getUserMedia)throw Error('Для камери потрібен HTTPS та підтримуваний браузер.');
+      await stopCamera();
+      const H=await lazyScript('https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js','Html5Qrcode');
+      $('#scan-reader').textContent='';barcodeScanner=new H('scan-reader');
+      await barcodeScanner.start({facingMode:'environment'},{fps:8,qrbox:{width:230,height:150}},async value=>{
+        $('#barcode-input').value=String(value).replace(/\D/g,'');await stopCamera();await lookupBarcode();
+      },()=>{});
+      status.textContent='Наведи камеру на штрихкод товару.';
+    }catch(e){status.textContent='Камера: '+(e.message||'немає доступу')+'. Можна ввести код вручну.';await stopCamera();}
+  }
+  async function stopCamera(){
+    if(!barcodeScanner)return;const s=barcodeScanner;barcodeScanner=null;
+    try{await s.stop();}catch(e){}
+    try{await s.clear();}catch(e){}
+    $('#scan-reader').textContent='Камера не запущена';
+  }
+  async function lookupBarcode(){
+    const code=$('#barcode-input').value.replace(/\D/g,'');
+    const status=$('#barcode-status');
+    if(code.length<8||code.length>14){status.textContent='Вкажи коректний штрихкод (8–14 цифр).';return;}
+    status.textContent='Шукаємо товар у Open Food Facts…';
+    try{
+      const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),9000);
+      let result;try{
+        const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_uk,product_name_de,brands,quantity,categories_tags`,{signal:controller.signal});
+        if(!r.ok)throw Error('Сервіс тимчасово недоступний');result=await r.json();
+      }finally{clearTimeout(timeout);}
+      const p=result.product;const name=p&&(p.product_name_uk||p.product_name_de||p.product_name);
+      if(result.status!==1||!name){status.textContent='Товару немає у базі. Додай вручну — код уже підставимо.';closeScan();openForm();$('#f-barcode').value=code;return;}
+      const found=state.items.find(i=>i.barcode===code);
+      closeScan();openForm(found||null);$('#f-name').value=found?.name||name.slice(0,65);
+      $('#f-category').value=found?.category||identifyCategory(name);
+      $('#f-barcode').value=code;
+      showToast(found?'Знайдено в холодильнику':'Товар знайдено — перевір кількість і дату');
+    }catch(e){status.textContent='Не вдалося отримати товар: '+(e.message||'помилка')+'. Можна ввести його вручну.';}
+  }
+  function findDates(text){
+    const matches=[...text.matchAll(/\b(\d{1,2})[.\-/](\d{1,2})[.\-/](20\d{2}|\d{2})\b/g)].slice(0,35);
+    const out=new Set();
+    matches.forEach(m=>{
+      const d=+m[1],mo=+m[2],y=+m[3]+(m[3].length===2?2000:0);
+      const dt=new Date(y,mo-1,d);
+      if(y>=2020&&y<=2040&&dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d)
+        out.add(`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+    });return [...out].sort();
+  }
+  function parseReceipt(text){
+    const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    const results=[];
+    for(const line of lines){
+      if(line.length>90||line.length<4||/^(summe|gesamt|total|betrag|kartenzahlung|zahlung|brutto|netto|mwst|steuer|wechselgeld|rückgeld|rueckgeld|rabatt|bon|kasse|danke|filiale|datum|transaktion|kundenbon|ust|subtot|zahlungsmittel)/i.test(line))continue;
+      const m=line.match(/^(.+?)\s+(\d{1,4}[,.]\d{2})(?:\s*[A-F*]?)\s*$/i);
+      if(!m)continue;
+      let name=m[1].replace(/^\s*\d+\s*[xX*]\s*/,'').replace(/\s{2,}/g,' ').trim();
+      if(name.length<3||!/[A-Za-zÀ-žА-Яа-яІіЇїЄєҐґ]/.test(name)||/^(art\.|menge|eur|€|pfand|coupon)/i.test(name))continue;
+      const price=Number(m[2].replace(',','.'));
+      if(!Number.isFinite(price)||price>500)continue;
+      results.push({name:name.slice(0,65),price,selected:true});
+    }
+    return results.slice(0,45);
+  }
+  function receiptRowMarkup(i,r){return `<div class="receipt-row" data-receipt-index="${i}"><input aria-label="Включити товар" type="checkbox" class="r-check" ${r.selected?'checked':''}/><input class="smart-input r-name" maxlength="65" type="text" aria-label="Назва товару" value="${esc(r.name)}"/><input class="smart-input r-price" min="0" step="0.01" max="100000" aria-label="Ціна у євро" type="number" value="${r.price||0}"/></div>`;}
+  function drawReceiptRows(){
+    $('#receipt-rows').innerHTML=receiptRows.map((r,i)=>receiptRowMarkup(i,r)).join('')||'<p class="smart-note">Позицій не знайдено. Додай вручну або спробуй інше фото.</p>';
+  }
+  function captureReceiptRows(){receiptRows=[...$('#receipt-rows').querySelectorAll('[data-receipt-index]')].map(row=>({selected:row.querySelector('.r-check').checked,name:row.querySelector('.r-name').value.trim(),price:Math.max(0,Number(row.querySelector('.r-price').value)||0)}));}
+  async function processOCR(file){
+    if(!file)return;
+    if(!file.type.startsWith('image/')||file.size>12_000_000){$('#ocr-status').textContent='Вибери фотографію до 12 МБ.';return;}
+    ocrLastFile=file;$('#ocr-status').textContent='Завантажуємо локальне розпізнавання…';$('#ocr-preview').hidden=true;
+    try{
+      const T=await lazyScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js','Tesseract');
+      const result=await T.recognize(file,'deu+eng',{logger:m=>{if(m.status==='recognizing text')$('#ocr-status').textContent=`Читаємо фото… ${Math.round((m.progress||0)*100)}%`;}});
+      ocrText=result?.data?.text||'';
+      if(!ocrText.trim())throw Error('Текст не знайдено. Зроби фото при кращому освітленні.');
+      $('#ocr-preview').hidden=false;
+      if(scanMode==='expiry'){
+        $('#receipt-preview-wrap').hidden=true;const dates=findDates(ocrText);
+        $('#ocr-dates').hidden=false;
+        $('#ocr-dates').innerHTML=dates.length?`<b>Можливі дати:</b><div style="display:grid;gap:7px;margin:8px 0">${dates.map((date,i)=>`<label><input name="selected-expiry" type="radio" value="${date}" ${i===0?'checked':''}/> ${date}</label>`).join('')}</div><label class="field-label" for="expiry-for-product">До якого продукту додати дату?</label><select id="expiry-for-product" class="smart-input">${state.items.filter(i=>i.qty>0).map(i=>`<option value="${esc(i.id)}">${esc(i.name)}</option>`).join('')}</select><button type="button" class="primary" id="apply-expiry">Зберегти вибрану дату</button>`:'Дати не знайдено. Можна встановити її вручну в картці продукту.';
+      }else{
+        $('#receipt-preview-wrap').hidden=false;$('#ocr-dates').hidden=true;
+        receiptRows=parseReceipt(ocrText);drawReceiptRows();
+        const tm=ocrText.match(/(?:gesamt|summe|total|betrag)\s*[:€ ]*([0-9]+[,.][0-9]{2})/i);
+        $('#receipt-total').value=tm?tm[1].replace(',','.'):'';
+      }
+      $('#ocr-status').textContent='Готово. OCR може помилятися — обов’язково перевір результат.';
+    }catch(e){$('#ocr-status').textContent='Не вдалося розпізнати: '+(e.message||'помилка мережі чи фото');}
+  }
+  function importReceipt(){
+    captureReceiptRows();const selected=receiptRows.filter(x=>x.selected&&x.name);
+    const rawTotal=$('#receipt-total').value;const total=rawTotal!==''?Number(rawTotal):selected.reduce((s,r)=>s+r.price,0);
+    if(!Number.isFinite(total)||total<0||total>100000){showToast('Перевір загальну суму чека');return;}
+    if(!selected.length){showToast('Вибери хоча б один товар');return;}
+    for(const r of selected){
+      const same=state.items.find(x=>x.name.toLowerCase()===r.name.toLowerCase());
+      if(same){same.qty=precision(same.qty+1);if(r.price>0)same.price=r.price;}
+      else state.items.unshift(validateItem({name:r.name,id:uid(),category:identifyCategory(r.name),qty:1,min:0,target:2,unit:'шт',price:r.price}));
+      state.shopping=state.shopping.filter(x=>x.name.toLowerCase()!==r.name.toLowerCase());
+    }
+    const store=$('#receipt-store').value.trim();state.receipts.push({id:uid(),date:new Date().toISOString(),store,total:precision(total)});
+    state.receipts=state.receipts.slice(-100);
+    logAction(`Чек${store?' '+store:''}: ${selected.length} товарів · ${euro(total)}`);
+    state.demo=false;save();render();closeScan();showToast(`Додано ${selected.length} товарів, перевір кількості й терміни`);
+  }
+  // Layout event binding.
+  [['#home-barcode','barcode'],['#home-receipt','receipt'],['#smart-barcode','barcode'],['#smart-receipt','receipt'],['#smart-expiry','expiry']].forEach(([sel,mode])=>$(sel).addEventListener('click',()=>openScan(mode)));
+  $('#smart-recipes').addEventListener('click',()=>$('#recipes-anchor').scrollIntoView({behavior:'smooth',block:'start'}));
+  $('#refresh-recipes').addEventListener('click',()=>{renderRecipes();showToast('Рекомендації оновлено за запасами');});
+  $('#close-scan').addEventListener('click',closeScan);$('#scan-dialog').addEventListener('click',e=>{if(e.target===$('#scan-dialog'))closeScan();});
+  $('#scan-dialog').addEventListener('close',()=>stopCamera());
+  $('#start-camera').addEventListener('click',startCamera);$('#stop-camera').addEventListener('click',stopCamera);
+  $('#lookup-barcode').addEventListener('click',lookupBarcode);$('#barcode-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lookupBarcode();}});
+  $('#ocr-file').addEventListener('change',e=>processOCR(e.target.files?.[0]));
+  $('#add-receipt-row').addEventListener('click',()=>{captureReceiptRows();receiptRows.push({name:'',price:0,selected:true});drawReceiptRows();});
+  $('#import-receipt').addEventListener('click',importReceipt);
+  $('#ocr-dates').addEventListener('click',e=>{if(e.target.id!=='apply-expiry')return;
+    const date=$('#ocr-dates input[name="selected-expiry"]:checked')?.value, id=$('#expiry-for-product')?.value;
+    const product=state.items.find(i=>i.id===id);if(!date||!product){showToast('Вкажи продукт і дату');return;}
+    product.expiry=date;logAction(`Дата для ${product.name}: ${date}`);save();render();closeScan();showToast('Дату збережено — перевір упаковку');
+  });
+  $('#recipe-list').addEventListener('click',e=>{const button=e.target.closest('[data-recipe]');if(!button)return;const r=RECIPES[Number(button.dataset.recipe)];
+    if(!r)return;let added=0;r.items.filter(x=>!hasIngredient(x)).forEach(name=>{if(!state.shopping.some(i=>i.name.toLowerCase()===name.toLowerCase())){state.shopping.push({id:uid(),name});added++;}});
+    if(added){logAction(`Рецепт «${r.name}»: ${added} покупок`);save();render();}showToast(added?`Додано ${added} позицій у покупки`:'Усе вже є в покупках');
+  });
+  $('#save-budget').addEventListener('click',()=>{state.settings.budget=Math.max(0,Math.min(100000,Number($('#monthly-budget').value)||0));save();renderSmart();showToast('Бюджет збережено');});
+  $('#clear-history').addEventListener('click',()=>{if(!confirm('Очистити журнал дій? Чеки та товари залишаться.'))return;state.events=[];save();renderSmart();});
+  $('#ask-ai').addEventListener('click',async()=>{
+    const el=$('#ai-response'),btn=$('#ask-ai'),q=$('#ai-question').value.trim();
+    if(!q){showToast('Введи питання');return;}
+    if(!tg?.initData){el.hidden=false;el.textContent='Для NVIDIA потрібен захищений вхід через Telegram Mini App. Зараз користуйся локальними рецептами — вони безкоштовні.';return;}
+    btn.disabled=true;el.hidden=false;el.textContent='Питаємо NVIDIA…';
+    try{
+      const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),26000);
+      let response;try{response=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData,question:q,items:state.items.filter(x=>x.qty>0).slice(0,80).map(x=>({name:x.name,qty:x.qty,unit:x.unit,expiry:x.expiry}))}),signal:controller.signal});}finally{clearTimeout(timeout);}
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error||`Помилка API ${response.status}`);
+      el.textContent=data.answer||'Немає відповіді';
+    }catch(e){el.textContent='ШІ недоступний: '+(e.message||'помилка')+'. Спробуй локальні рецепти вище.';}
+    finally{btn.disabled=false;}
+  });
+
+  save();render();
+})();
+</script>
+</body>
+</html>
