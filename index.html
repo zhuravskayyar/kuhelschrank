@@ -1495,14 +1495,16 @@ window.InlineQRCode=req('index');
     if(!o||typeof o!=='object')return null;
     const price=Number(o.price);if(!Number.isFinite(price)||price<=0||price>1000)return null;
     const date=String(o.date||'').slice(0,10);if(!/^\d{4}-\d\d-\d\d$/.test(date))return null;
-    return {price:Math.round(price*100)/100,date,discount:!!o.discount,shopId:validStore(o.shopId),shop:String(o.shop||'').slice(0,42),city:String(o.city||'').slice(0,65),sourceUrl:String(o.sourceUrl||'').startsWith('https://prices.openfoodfacts.org/prices/')?String(o.sourceUrl).slice(0,140):'',checkedAt:String(o.checkedAt||'').slice(0,30)};
+    const rawShopId=String(o.shopId||'');
+    const shopId=validStore(rawShopId)||(/^open-[a-z0-9-]{1,48}$/.test(rawShopId)?rawShopId:'');
+    return {price:Math.round(price*100)/100,date,discount:!!o.discount,shopId,shop:String(o.shop||'').slice(0,42),city:String(o.city||'').slice(0,65),countryCode:/^[A-Z]{2}$/.test(String(o.countryCode||''))?String(o.countryCode):'',sourceUrl:String(o.sourceUrl||'').startsWith('https://prices.openfoodfacts.org/prices/')?String(o.sourceUrl).slice(0,140):'',checkedAt:String(o.checkedAt||'').slice(0,30)};
   }
   function cleanHistory(list){return Array.isArray(list)?list.slice(-30).filter(x=>x&&Number.isFinite(Number(x.price))&&Number(x.price)>0).map(x=>({price:Math.round(Number(x.price)*100)/100,store:validStore(x.store),date:String(x.date||'').slice(0,30),kind:String(x.kind||'receipt').slice(0,18)})):[];}
   function validateItem(x){
     if (!x || typeof x!=='object' || !String(x.name||'').trim()) return null;
     const number=(n,fallback)=>Number.isFinite(Number(n))?Math.max(0,Math.min(100000,Number(n))):fallback;
     const min=number(x.min,0), target=Math.max(number(x.target,1),min,.01);
-    return {imageUrl:approvedImage(x.imageUrl),imageSourceUrl:approvedSource(x.imageSourceUrl),id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120),store:validStore(x.store),purchaseHistory:cleanHistory(x.purchaseHistory),market:cleanMarket(x.market),marketOptions:Array.isArray(x.marketOptions)?x.marketOptions.slice(0,12).map(cleanMarket).filter(Boolean):[],marketCheckedAt:String(x.marketCheckedAt||'').slice(0,30)};
+    return {imageUrl:approvedImage(x.imageUrl),imageSourceUrl:approvedSource(x.imageSourceUrl),id:String(x.id||uid()).slice(0,100),name:String(x.name).trim().slice(0,65),category:CATS[x.category]?x.category:'other',qty:number(x.qty,0),unit:['шт','уп.','л','кг','г'].includes(x.unit)?x.unit:'шт',min,target,expiry:/^\d{4}-\d\d-\d\d$/.test(x.expiry||'')?x.expiry:'',price:number(x.price,0),place:['fridge','freezer','pantry'].includes(x.place)?x.place:'fridge',barcode:String(x.barcode||'').replace(/[^0-9]/g,'').slice(0,22),note:String(x.note||'').slice(0,120),store:validStore(x.store),purchaseHistory:cleanHistory(x.purchaseHistory),market:cleanMarket(x.market),marketOptions:Array.isArray(x.marketOptions)?x.marketOptions.slice(0,12).map(cleanMarket).filter(Boolean):[],marketCheckedAt:String(x.marketCheckedAt||'').slice(0,30),marketScope:['DE','international','none'].includes(x.marketScope)?x.marketScope:''};
   }
   const validTimestamp=value=>typeof value==='string'&&!Number.isNaN(Date.parse(value))?value:new Date().toISOString();
   function tombstones(raw){if(!raw||typeof raw!=='object'||Array.isArray(raw))return {};return Object.fromEntries(Object.entries(raw).filter(([id,at])=>id&&typeof at==='string'&&!Number.isNaN(Date.parse(at))).sort((a,b)=>Date.parse(b[1])-Date.parse(a[1])).slice(0,5000).map(([id,at])=>[String(id).slice(0,100),at]));}
@@ -1898,11 +1900,12 @@ window.InlineQRCode=req('index');
       const sameShop=!!market&&!!i.store&&(market.shopId===i.store||(market.shopId==='aldi'&&i.store.startsWith('aldi')));const diff=sameShop&&recorded>0?Math.round((market.price-recorded)*100)/100:null;
       const dated=market?market.date:'';
       const options=(i.marketOptions||[]).filter(x=>x.shopId&&(!market||x.shopId!==market.shopId)).slice(0,4);
+      const scopeNote=i.marketScope==='international'?'<small>Записів із Німеччини для цього штрихкоду немає; показано орієнтир з іншої країни.</small>':'';
       const purchased=i.purchaseHistory?.length?i.purchaseHistory[i.purchaseHistory.length-1]:null;
-      const external=market?'<div class="source-row"><span class="price-amount">'+euro(observed)+'</span><span class="store-tag">'+esc(market.shop||SHOP_NAMES[market.shopId]||'Магазин')+'</span>'+ (diff!==null?'<span class="price-diff '+(diff>0?'up':diff<0?'down':'')+'">'+(diff>0?'▲ +':diff<0?'▼ ':'')+euro(Math.abs(diff))+' до покупки</span>':'')+'</div><small>Спостерігали: '+esc(dated)+(market.city?' · '+esc(market.city):'')+(market.discount?' · акційна ціна':'')+' · це не поточний прайс</small><div class="source-row">'+(market.sourceUrl?'<a href="'+esc(market.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Джерело Open Prices</a>':'')+'</div>':'<small>Немає перевіреного запису для цього штрихкоду та магазину.</small>';
+      const external=market?'<div class="source-row"><span class="price-amount">'+euro(observed)+'</span><span class="store-tag">'+esc(market.shop||SHOP_NAMES[market.shopId]||'Магазин')+'</span>'+ (diff!==null?'<span class="price-diff '+(diff>0?'up':diff<0?'down':'')+'">'+(diff>0?'▲ +':diff<0?'▼ ':'')+euro(Math.abs(diff))+' до покупки</span>':'')+'</div><small>Спостерігали: '+esc(dated)+(market.city?' · '+esc(market.city):'')+(market.countryCode?' · '+esc(market.countryCode):'')+(market.discount?' · акційна ціна':'')+' · це не поточний прайс</small><div class="source-row">'+(market.sourceUrl?'<a href="'+esc(market.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Джерело Open Prices</a>':'')+'</div>':'<small>'+(i.marketScope==='none'?'У відкритій базі поки немає спостережень для цього штрихкоду.':'Немає перевіреного запису для цього штрихкоду та магазину.')+'</small>';
       return '<article class="market-price-row"><div class="between"><b>'+esc(i.name)+'</b><span class="store-tag">'+esc(SHOP_NAMES[i.store]||'Магазин невідомий')+'</span></div>'+
         (recorded?'<small>Моя ціна: '+euro(recorded)+(purchased?.date?' · '+esc(purchased.date.slice(0,10)):'')+'</small>':'<small>Власної ціни ще немає</small>')+
-        external+(options.length?'<small>Інші магазини: '+options.map(x=>esc(x.shop)+': '+euro(x.price)+' ('+esc(x.date)+')').join(' · ')+'</small>':'')+
+        external+scopeNote+(options.length?'<small>Інші магазини: '+options.map(x=>esc(x.shop)+(x.countryCode?' ['+esc(x.countryCode)+']':'')+': '+euro(x.price)+' ('+esc(x.date)+')').join(' · ')+'</small>':'')+
         (!i.barcode?'<small>Для пошуку зовнішніх цін додай штрихкод.</small>':'')+'</article>';
     }).join('');
   }
@@ -1929,6 +1932,7 @@ window.InlineQRCode=req('index');
           if(!current)continue;
           const opts=(data.prices||[]).map(p=>cleanMarket({...p,checkedAt:new Date().toISOString()})).filter(Boolean);
           current.marketOptions=opts;
+          current.marketScope=data.scope||'none';
           const chosen=opts.find(p=>p.shopId===current.store)||opts.find(p=>current.store&&current.store.startsWith('aldi')&&p.shopId==='aldi')||(!current.store?opts[0]:null);
           current.market=chosen||null;
           current.marketCheckedAt=today;
