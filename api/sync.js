@@ -1,4 +1,4 @@
-import { isAllowedTelegramUser, verifyTelegramInitData } from '../lib/telegram-auth.js';
+import { inspectTelegramInitData, isAllowedTelegramUser, telegramInitDataError } from '../lib/telegram-auth.js';
 import { requestSharedStore } from '../lib/shared-store.js';
 
 function respond(res, status, body) {
@@ -29,8 +29,9 @@ export default async function handler(req, res) {
     return respond(res, 400, { error: 'Некоректний JSON' });
   }
 
-  const user = verifyTelegramInitData(body?.initData, process.env.TELEGRAM_BOT_TOKEN);
-  if (!user) return respond(res, 401, { error: 'Відкрий застосунок через Telegram' });
+  const auth = inspectTelegramInitData(body?.initData, process.env.TELEGRAM_BOT_TOKEN);
+  if (!auth.user) return respond(res, 401, { error: telegramInitDataError(auth.reason), code: auth.reason });
+  const user = auth.user;
   if (!isAllowedTelegramUser(user)) return respond(res, 403, { error: 'Цей Telegram-акаунт не має доступу до спільної Полички' });
 
   const member = userForStore(user);

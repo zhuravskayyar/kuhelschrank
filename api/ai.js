@@ -1,4 +1,4 @@
-import { isAllowedTelegramUser, verifyTelegramInitData } from '../lib/telegram-auth.js';
+import { inspectTelegramInitData, isAllowedTelegramUser, telegramInitDataError } from '../lib/telegram-auth.js';
 
 const recentRequests = new Map(); // Best-effort only; not durable across serverless instances.
 
@@ -22,8 +22,9 @@ export default async function handler(req, res) {
     return refuse(res, 413, 'Завеликий запит');
   }
 
-  const user = verifyTelegramInitData(body.initData, TELEGRAM_BOT_TOKEN);
-  if (!user) return refuse(res, 401, 'Потрібен дійсний Telegram Mini App вхід');
+  const auth = inspectTelegramInitData(body.initData, TELEGRAM_BOT_TOKEN);
+  if (!auth.user) return res.status(401).json({ error: telegramInitDataError(auth.reason), code: auth.reason });
+  const user = auth.user;
   if (!isAllowedTelegramUser(user)) return refuse(res, 403, 'Цей акаунт не має доступу до NVIDIA');
 
   const question = typeof body.question === 'string' ? body.question.trim().slice(0, 450) : '';
