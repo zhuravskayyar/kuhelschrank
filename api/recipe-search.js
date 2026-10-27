@@ -6,7 +6,7 @@ function send(res,status,data){
  return res.status(status).json(data);
 }
 function normalizeSearch(value){
- return String(value||'').replace(/[^0-9a-zA-Zа-яА-ЯіІїЇєЄґҐğĞüÜöÖäÄß\s-]/gu,'').trim().replace(/\s+/g,' ').slice(0,65);
+ return String(value||'').replace(/[’ʼ`]/g,"'").replace(/[^0-9a-zA-Zа-яА-ЯіІїЇєЄґҐğĞüÜöÖäÄß'\s-]/gu,'').trim().replace(/\s+/g,' ').slice(0,65);
 }
 function safeRef(url){
  try{const u=new URL(String(url||''));return u.protocol==='https:'?u.toString().slice(0,600):''}catch{return ''}
