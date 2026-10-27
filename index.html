@@ -1875,6 +1875,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')retryCloudSync();});
   window.addEventListener('focus',retryCloudSync);
   window.addEventListener('online',retryCloudSync);
+  window.setInterval(()=>{if(document.visibilityState==='visible'&&!syncInProgress)retryCloudSync();},30_000);
 
   $('#filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;filter=b.dataset.filter;renderStock();});
   $('#search-products').addEventListener('input',renderStock);
