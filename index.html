@@ -156,6 +156,24 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
 .weekly-menu-home strong{font-size:13px}.weekly-menu-home p{font-size:11px;line-height:1.5;margin:6px 0 0}
 .weekly-menu-home button{border:1px solid #353038;border-radius:8px;background:#fff;padding:7px 10px;font-weight:750;margin-top:7px;font-size:11px}
 .weekly-budget-row{display:flex;gap:9px;flex-wrap:wrap;margin:9px 0}.weekly-budget-row span{background:#fff;border:1px solid #e1dade;padding:7px 10px;border-radius:8px}
+
+    /* Recipes: collapsed by default, results rendered only when requested. */
+    #catalog-body[hidden],#catalog-load-more[hidden],#catalog-suggestion[hidden]{display:none!important}
+    .recipe-catalog{padding:0;overflow:hidden}
+    .catalog-toggle{border:0;background:#fff;width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:14px 15px;color:var(--ink);cursor:pointer}
+    .catalog-toggle:focus-visible{outline:3px solid #a896ed;outline-offset:-3px}
+    .catalog-toggle strong{display:block;font-size:17px;font-weight:950;line-height:1.2}
+    .catalog-toggle small{display:block;color:#777179;font-size:11px;line-height:1.5;font-weight:700;margin-top:4px}
+    .catalog-toggle .toggle-glyph{width:31px;height:31px;flex-shrink:0;display:grid;place-items:center;border:2px solid var(--ink);border-radius:9px;background:var(--lemon);font-size:19px;transition:transform .18s}
+    .catalog-toggle[aria-expanded="true"] .toggle-glyph{transform:rotate(180deg)}
+    #catalog-body{padding:0 15px 15px;border-top:1px solid #ebe6e6}
+    #catalog-body .catalog-categories{margin-top:6px}
+    .catalog-more{width:100%;margin:9px 0 3px;padding:12px 9px;font-weight:850;border:2px solid #1a1a1d;background:#e4f2e9;border-radius:10px}
+    .recipe-suggestion{background:#fff6de;border:1.5px solid #b89d68;border-radius:11px;margin-top:12px;padding:12px}
+    .recipe-suggestion p{font-size:12px;font-weight:750;color:#393027}
+    .recipe-suggestion textarea{width:100%;min-height:72px;resize:vertical;border:1.5px solid #302b26;border-radius:9px;background:white;padding:9px;font:inherit;font-size:12px;margin-top:8px}
+    .recipe-suggestion button{margin-top:8px;background:var(--lemon);border:1.5px solid #1a1a1d;border-radius:9px;font-size:12px;font-weight:900;padding:10px}
+    .recipe-suggestion small{display:block;margin-top:7px;color:#685d4d;font-size:10px;line-height:1.45}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -212,7 +230,7 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
         <button class="assist-tile" id="smart-expiry"><span class="glyph">◷</span><strong>Знайти дату</strong><small>Фото упаковки та OCR</small></button>
         <button class="assist-tile" id="smart-recipes"><span class="glyph">♨</span><strong>Що приготувати</strong><small>Рецепти з твоїх продуктів</small></button>
       </div>
-      <div class="smart-panel" id="weekly-menu-panel"><div class="between"><h3>Наше меню на тиждень</h3><span class="badge-source">НА ДВОХ</span></div><p class="smart-caption" id="weekly-menu-note">Одна повноцінна страва й один перекус. Не означає, що продукти вже куплені.</p><div id="weekly-menu-rows"></div><div id="weekly-menu-budget" class="smart-caption"></div></div><div class="smart-panel recipe-catalog" id="recipe-catalog-anchor"><div class="between"><h3>Знайти страву</h3><span class="badge-source">КАТАЛОГ</span></div><p class="smart-caption">Введи назву страви — покажемо інгредієнти, які є вдома і які треба докупити. Дані цін показуємо тільки якщо маємо джерело.</p><label class="field-label" for="catalog-recipe-query">Пошук рецепта</label><input class="smart-input" id="catalog-recipe-query" type="search" placeholder="Борщ, деруни, олів'є…" maxlength="65" autocomplete="off"/><div class="catalog-categories" id="catalog-recipe-categories"><button type="button" data-recipe-category="all" class="active">Усі</button><button type="button" data-recipe-category="Супи">Супи</button><button type="button" data-recipe-category="Основні">Основні</button><button type="button" data-recipe-category="Салати">Салати</button><button type="button" data-recipe-category="Сніданки">Сніданки</button><button type="button" data-recipe-category="Випічка">Випічка</button></div><p class="smart-caption" id="catalog-status" role="status" aria-live="polite">Завантажуємо каталог рецептів…</p><div class="catalog-results" id="catalog-results"></div></div><div class="smart-panel"><div class="between"><h3>Що варто зробити</h3><span class="badge-source">АВТО</span></div><div id="smart-insights"></div></div>
+      <div class="smart-panel" id="weekly-menu-panel"><div class="between"><h3>Наше меню на тиждень</h3><span class="badge-source">НА ДВОХ</span></div><p class="smart-caption" id="weekly-menu-note">Одна повноцінна страва й один перекус. Не означає, що продукти вже куплені.</p><div id="weekly-menu-rows"></div><div id="weekly-menu-budget" class="smart-caption"></div></div><div class="smart-panel recipe-catalog" id="recipe-catalog-anchor"><button type="button" id="catalog-toggle" class="catalog-toggle" aria-expanded="false" aria-controls="catalog-body"><span><strong>Знайти страву</strong><small>Рецепти й інгредієнти · стандарт 2 порції</small></span><span class="toggle-glyph" aria-hidden="true">⌄</span></button><div id="catalog-body" hidden><p class="smart-caption">Введи назву страви — покажемо інгредієнти, які є вдома і які треба докупити. Дані цін показуємо тільки якщо маємо джерело.</p><label class="field-label" for="catalog-recipe-query">Пошук рецепта</label><input class="smart-input" id="catalog-recipe-query" type="search" placeholder="Борщ, деруни, олів'є…" maxlength="65" autocomplete="off"/><div class="catalog-categories" id="catalog-recipe-categories"><button type="button" data-recipe-category="all" class="active">Усі</button><button type="button" data-recipe-category="Супи">Супи</button><button type="button" data-recipe-category="Основні">Основні</button><button type="button" data-recipe-category="Салати">Салати</button><button type="button" data-recipe-category="Сніданки">Сніданки</button><button type="button" data-recipe-category="Випічка">Випічка</button></div><p class="smart-caption" id="catalog-status" role="status" aria-live="polite">Завантажуємо каталог рецептів…</p><div class="catalog-results" id="catalog-results"></div><button type="button" class="catalog-more" id="catalog-load-more" hidden>Показати більше рецептів</button><div id="catalog-suggestion" class="recipe-suggestion" hidden><p>Не знайшли цю страву? Залиш назву й, за бажанням, інгредієнти — додамо до черги поповнення каталогу.</p><label class="field-label" for="catalog-suggestion-ingredients">Інгредієнти (необов’язково)</label><textarea id="catalog-suggestion-ingredients" maxlength="600" placeholder="Картопля — 300 г, цибуля — 1 шт…"></textarea><button type="button" id="catalog-suggest">Запропонувати рецепт</button><small>Запит збережеться у базі після підтвердження Telegram-входу; рецепт не з’явиться автоматично без перевірки складу.</small></div></div></div><div class="smart-panel"><div class="between"><h3>Що варто зробити</h3><span class="badge-source">АВТО</span></div><div id="smart-insights"></div></div>
       <div class="smart-panel" id="recipes-anchor"><div class="between"><h3>Ідеї на вечерю</h3><button class="text-btn" id="refresh-recipes" type="button">Оновити ↗</button></div><div class="recipe-list" id="recipe-list"></div><p class="smart-caption">Це підбір за назвами продуктів, не перевірка реальної придатності чи безпеки їжі.</p></div>
       <div class="smart-panel"><h3>Спитай Поличку ✳</h3><p>Можна використати NVIDIA NIM через захищену функцію Vercel. Без ключа працює локальний підбір рецептів вище.</p><label class="field-label" for="ai-question">Твоє питання</label><textarea class="smart-input" id="ai-question" rows="3" style="height:87px;resize:vertical" maxlength="450" placeholder="Що приготувати на вечерю без походу в магазин?"></textarea><button class="primary" type="button" id="ask-ai">Отримати пораду</button><div id="ai-response" class="smart-output" hidden></div><p class="smart-caption">ШІ доступний лише після налаштування NVIDIA та авторизованого Telegram-входу; не надсилай сюди особисті дані.</p></div>
       <div class="smart-panel"><h3>Витрати та покупки</h3><div class="summary-grid"><div class="summary-box"><small>За чеками (30 днів)</small><b id="spent-30">0 €</b></div><div class="summary-box"><small>Чеків у базі</small><b id="receipts-count">0</b></div></div><label class="field-label" for="monthly-budget">Бюджет продуктів на місяць, €</label><div class="smart-row"><input class="smart-input" id="monthly-budget" type="number" min="0" max="100000" step="1" value="0"><button class="outline-small" type="button" id="save-budget">Зберегти</button></div><p id="budget-hint" class="smart-caption"></p></div>
@@ -242,7 +260,7 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
       <div class="form-group full"><label for="f-store">Де куплено</label><select id="f-store"><option value="">Невідомий / інший</option><option value="lidl">Lidl</option><option value="aldi-sued">Aldi Süd</option><option value="aldi-nord">Aldi Nord</option><option value="rewe">REWE</option><option value="penny">Penny</option><option value="netto">Netto</option><option value="kaufland">Kaufland</option><option value="edeka">EDEKA</option></select><p class="form-help">Магазин потрібен для історії цін. Якщо не впевнений — залиш невідомим.</p></div><div class="form-group full"><label for="f-barcode">Штрихкод (необов'язково)</label><input id="f-barcode" type="text" inputmode="numeric" maxlength="22" placeholder="EAN / GTIN" /></div>
       <div class="form-group full"><label for="f-note">Нотатка</label><input id="f-note" maxlength="120" placeholder="Наприклад, відкрите сьогодні" /></div><div class="form-group full photo-field"><label>Фото товару з інтернету</label><div class="photo-control"><div id="photo-preview" class="photo-preview"><span>Без фото</span></div><div class="photo-actions"><button id="find-product-photo" class="outline-small" type="button">Знайти реальне фото</button><button id="remove-product-photo" class="outline-small" type="button">Прибрати фото</button><p id="photo-status" class="photo-status" aria-live="polite">Пошук у Open Food Facts — без ШІ та без оплати.</p></div></div><div id="photo-results" class="photo-results" aria-label="Знайдені фото"></div><p class="photo-credit">Фото: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer">Open Food Facts</a> (CC BY-SA) або <a href="https://commons.wikimedia.org" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a> (ліцензія залежить від файлу). <a id="photo-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Джерело цього фото</a></p></div></div><p class="form-error" id="form-error" role="alert"></p><button class="primary" type="submit">Зберегти продукт</button><button class="danger-btn" id="delete-product" type="button" hidden>Видалити цей продукт</button></form></div></dialog>
 <dialog id="scan-dialog" aria-labelledby="scan-title"><div class="sheet"><div class="sheet-header"><h2 id="scan-title">Сканер</h2><button type="button" id="close-scan" class="close" aria-label="Закрити">×</button></div><p id="scan-hint" class="smart-note">Відскануй упаковку або введи код вручну.</p><div id="barcode-content"><div id="scan-reader" class="scan-area">Камера не запущена</div><div class="smart-row"><button class="outline-small" type="button" id="start-camera">Увімкнути камеру</button><button class="outline-small" type="button" id="stop-camera">Зупинити</button></div><label class="field-label" for="barcode-input">Код товару</label><div class="smart-row"><input id="barcode-input" class="smart-input" type="text" inputmode="numeric" maxlength="22" placeholder="Наприклад 3017620422003"/><button class="outline-small" id="lookup-barcode" type="button">Знайти</button></div><p class="smart-note" id="barcode-status"></p></div><div id="ocr-content" hidden><label class="field-label" for="ocr-file">Зроби фото або вибери з галереї</label><input class="smart-input" id="ocr-file" type="file" accept="image/*" capture="environment"/><p class="smart-note" id="ocr-status">Обробка відбувається локально на твоєму пристрої. Перший запуск завантажує OCR-модель.</p><div id="ocr-preview" hidden><div id="ocr-dates" class="smart-output" hidden></div><div id="receipt-preview-wrap"><p class="smart-note">Перевір знайдені позиції, відредагуй назви та ціни. Зайве зніми галочкою.</p><div id="receipt-rows" class="receipt-table"></div><button class="outline-small" id="add-receipt-row" type="button">+ Додати рядок</button><div class="smart-row"><select class="smart-input" id="receipt-store" aria-label="Магазин з чека"><option value="">Невідомий / інший</option><option value="lidl">Lidl</option><option value="aldi-sued">Aldi Süd</option><option value="aldi-nord">Aldi Nord</option><option value="rewe">REWE</option><option value="penny">Penny</option><option value="netto">Netto</option><option value="kaufland">Kaufland</option><option value="edeka">EDEKA</option></select><input class="smart-input" id="receipt-total" type="number" min="0" max="100000" step="0.01" placeholder="Сума €"/></div><button class="primary" id="import-receipt" type="button">Додати обрані продукти</button></div></div></div></div></dialog>
-<dialog id="recipe-catalog-dialog" aria-labelledby="recipe-detail-title"><div class="sheet recipe-detail-sheet"><div class="sheet-header"><h2 id="recipe-detail-title">Інгредієнти</h2><button type="button" class="close" id="close-recipe-detail" aria-label="Закрити рецепт">×</button></div><div class="detail-controls"><label for="recipe-servings">Порцій:</label><select id="recipe-servings" class="smart-input"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="8">8</option></select><span id="recipe-detail-time"></span></div><p id="recipe-detail-hint" class="smart-caption"></p><div id="recipe-detail-ingredients" class="recipe-detail-ingredients"></div><div id="recipe-detail-cost" class="recipe-detail-cost"></div><button type="button" class="primary" id="recipe-add-missing">Додати відсутнє в покупки</button><div id="recipe-detail-steps"></div><p class="smart-caption recipe-source" id="recipe-source"></p></div></dialog><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog id="recipe-catalog-dialog" aria-labelledby="recipe-detail-title"><div class="sheet recipe-detail-sheet"><div class="sheet-header"><h2 id="recipe-detail-title">Інгредієнти</h2><button type="button" class="close" id="close-recipe-detail" aria-label="Закрити рецепт">×</button></div><div class="detail-controls"><label for="recipe-servings">Порцій:</label><select id="recipe-servings" class="smart-input"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="8">8</option></select><span id="recipe-detail-time"></span></div><p id="recipe-detail-hint" class="smart-caption"></p><div id="recipe-detail-ingredients" class="recipe-detail-ingredients"></div><div id="recipe-detail-cost" class="recipe-detail-cost"></div><button type="button" class="primary" id="recipe-add-missing">Додати відсутнє в покупки</button><div id="recipe-detail-steps"></div><p class="smart-caption recipe-source" id="recipe-source"></p></div></dialog><div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- QR generator: Kazuhiko Arase's MIT-licensed QRCode implementation, bundled below. -->
 <script>
 /* MIT QRCode for JavaScript, Kazuhiko Arase. */
@@ -2250,7 +2268,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     return fmt(v)+' '+u;
   }
   function recipeRowsFor(recipe,servings){
-    const defaultCount=Number(recipe.servings)||4,scale=Number(recipe.servings)?servings/defaultCount:1;
+    const defaultCount=Number(recipe.servings)||2,scale=Number(recipe.servings)?servings/defaultCount:1;
     return (recipe.ingredients||[]).map(ing=>{
       const q=Number.isFinite(Number(ing.quantity))&&ing.quantity!==null?Number(ing.quantity)*scale:null;
       const req=baseRecipeUnit(q,ing.unit);
@@ -2290,34 +2308,76 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     });
   }
   let catalogRecipes=[],catalogQuery='',catalogCategory='all',catalogRequestSeq=0,
-    catalogTimer=null,selectedCatalogRecipe=null,catalogCache=new Map();
+    catalogTimer=null,selectedCatalogRecipe=null,catalogCache=new Map(),catalogVisibleCount=6;
+  const catalogLoggedRecently=new Map();
+  function setCatalogOpen(open,focus=false){
+    $('#catalog-body').hidden=!open;
+    $('#catalog-toggle').setAttribute('aria-expanded',String(open));
+    if(open&&focus)$('#catalog-recipe-query').focus({preventScroll:true});
+  }
+  function recordRecipeRequest(query,category,resultCount,suggested=false,ingredients=''){
+    if(!tg?.initData)return Promise.resolve(false);
+    const payload={initData:tg.initData,query,category,resultCount,suggested,ingredients};
+    return fetch('/api/recipe-requests',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+    }).then(r=>r.ok).catch(()=>false);
+  }
+  function trackCompletedRecipeSearch(query,category,count){
+    if(query.length<2)return;
+    const key=category+'|'+query.toLocaleLowerCase('uk');
+    const now=Date.now();
+    if(now-(catalogLoggedRecently.get(key)||0)<60000)return;
+    catalogLoggedRecently.set(key,now);
+    if(catalogLoggedRecently.size>70)catalogLoggedRecently.clear();
+    recordRecipeRequest(query,category,count);
+  }
   function renderCatalogList(){
-    const mount=$('#catalog-results');
+    const mount=$('#catalog-results'),more=$('#catalog-load-more'),suggest=$('#catalog-suggestion');
     if(!mount)return;
-    if(!catalogRecipes.length){mount.innerHTML='<p class="smart-caption">Рецептів за запитом не знайдено. Спробуй іншу назву.</p>';return;}
-    mount.innerHTML=catalogRecipes.map((r,i)=>{
-      const rows=recipeRowsFor(r,Number(r.servings)||4);
+    more.hidden=true;suggest.hidden=true;
+    if(!catalogQuery&&catalogCategory==='all'){
+      mount.innerHTML='';return;
+    }
+    if(!catalogRecipes.length){
+      mount.innerHTML='<p class="smart-caption">За запитом рецептів поки немає.</p>';
+      suggest.hidden=catalogQuery.length<2;
+      return;
+    }
+    mount.innerHTML=catalogRecipes.slice(0,catalogVisibleCount).map((r,i)=>{
+      const rows=recipeRowsFor(r,2);
       const covered=rows.filter(x=>x.enough).length;
       const missing=rows.filter(x=>!x.enough&&!x.uncertain).length;
       return '<button type="button" class="catalog-result" data-catalog-index="'+i+'"><span><b>'+esc(r.name_uk)+'</b><small>'+
-      esc(r.category)+' · '+(r.minutes?esc(r.minutes)+' хв · ':'')+rows.length+' інгредієнтів'+
+      esc(r.category)+' · '+(r.minutes?esc(r.minutes)+' хв · ':'')+rows.length+' інгредієнтів · 2 порції'+
       (r.origin==='TheMealDB'?' · англійською':'')+'</small></span>'+
       '<span class="recipe-score '+(missing?'missing':'')+'">Вдома '+covered+'/'+rows.length+'</span></button>';
     }).join('');
+    if(catalogRecipes.length>catalogVisibleCount){
+      more.hidden=false;
+      more.textContent='Показати ще '+(catalogRecipes.length-catalogVisibleCount)+' рецептів';
+    }
   }
   async function loadRecipeCatalog(query='',category='all'){
-    catalogQuery=String(query||'').trim().slice(0,65);catalogCategory=category;
-    const sequence=++catalogRequestSeq, key=category+'|'+catalogQuery.toLocaleLowerCase('uk');
+    catalogQuery=String(query||'').trim().slice(0,65);
+    catalogCategory=category;catalogVisibleCount=6;
+    const sequence=++catalogRequestSeq,key=category+'|'+catalogQuery.toLocaleLowerCase('uk');
     $('#catalog-recipe-query').value=catalogQuery;
     document.querySelectorAll('[data-recipe-category]').forEach(b=>b.classList.toggle('active',b.dataset.recipeCategory===category));
+    if(!catalogQuery&&category==='all'){
+      catalogRecipes=[];
+      $('#catalog-status').textContent='Введи назву страви або обери категорію.';
+      renderCatalogList();return;
+    }
     if(catalogCache.has(key)){
-      catalogRecipes=catalogCache.get(key);renderCatalogList();
-      $('#catalog-status').textContent='Рецептів знайдено: '+catalogRecipes.length+'.';
+      catalogRecipes=catalogCache.get(key);
+      renderCatalogList();
+      $('#catalog-status').textContent='Знайдено рецептів: '+catalogRecipes.length+'.';
+      trackCompletedRecipeSearch(catalogQuery,category,catalogRecipes.length);
       return;
     }
     $('#catalog-status').textContent='Шукаємо рецепти…';
     try{
-      const params=new URLSearchParams({q:catalogQuery,limit:'40'});
+      const params=new URLSearchParams({q:catalogQuery,limit:'30'});
       if(category!=='all')params.set('category',category);
       const response=await fetch('/api/recipe-search?'+params);
       const data=await response.json();
@@ -2329,14 +2389,18 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
       $('#catalog-status').textContent='Знайдено рецептів: '+catalogRecipes.length+
         (data.source==='TheMealDB'?' · зовнішні рецепти (англійською).':'.');
       renderCatalogList();
+      trackCompletedRecipeSearch(catalogQuery,category,catalogRecipes.length);
     }catch(e){
       if(sequence===catalogRequestSeq){
-        catalogRecipes=[];$('#catalog-status').textContent=e.message||'Каталог недоступний';
+        catalogRecipes=[];
+        $('#catalog-status').textContent=e.message||'Каталог недоступний';
         $('#catalog-results').innerHTML='<p class="smart-caption">Не вдалося завантажити рецепти. Перевір з’єднання та спробуй ще раз.</p>';
+        $('#catalog-suggestion').hidden=true;
+        $('#catalog-load-more').hidden=true;
       }
     }
   }
-  function selectedRecipeServings(){return Number($('#recipe-servings').value)||4;}
+  function selectedRecipeServings(){return Number($('#recipe-servings').value)||2;}
 
   // Observed (not official live) produce prices, fetched only for relevant known taxonomy items.
   const rawProduceNames=new Set(['буряк','картопля','морква','цибуля','помідори','огірки','яблука','банани','лимон','капуста','часник','гарбуз','перець болгарський','баклажан','кабачок']);
@@ -2422,7 +2486,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   function openCatalogRecipe(recipe){
     if(!recipe)return;
     selectedCatalogRecipe=recipe;
-    $('#recipe-servings').value=String(recipe.servings||4);
+    $('#recipe-servings').value='2';
     renderRecipeDetail();
     $('#recipe-catalog-dialog').showModal();
     loadRecipeProducePrices(recipe);
@@ -2448,17 +2512,36 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     showToast(added?'Додано '+added+' позицій у покупки':'Ці інгредієнти вже у списку');
     if(added)setTab('shopping');
   });
+  $('#catalog-toggle').addEventListener('click',()=>{
+    setCatalogOpen($('#catalog-body').hidden,!$('#catalog-body').hidden);
+  });
+  $('#catalog-load-more').addEventListener('click',()=>{
+    catalogVisibleCount+=12;renderCatalogList();
+  });
+  $('#catalog-suggest').addEventListener('click',async()=>{
+    if(catalogQuery.length<2)return;
+    const button=$('#catalog-suggest');
+    button.disabled=true;
+    const saved=await recordRecipeRequest(catalogQuery,catalogCategory,catalogRecipes.length,true,$('#catalog-suggestion-ingredients').value);
+    button.disabled=false;
+    if(saved){
+      $('#catalog-suggestion-ingredients').value='';
+      showToast('Страву додано в чергу рецептів');
+      $('#catalog-suggestion').hidden=true;
+    }else showToast('Не збережено. Відкрий Поличку через Telegram-бота й спробуй ще раз.');
+  });
   $('#catalog-recipe-query').addEventListener('input',e=>{
     const value=e.target.value;clearTimeout(catalogTimer);
-    catalogTimer=setTimeout(()=>loadRecipeCatalog(value,catalogCategory),260);
+    catalogTimer=setTimeout(()=>loadRecipeCatalog(value,catalogCategory),450);
   });
   $('#catalog-recipe-categories').addEventListener('click',e=>{
     const b=e.target.closest('[data-recipe-category]');if(!b)return;
+    clearTimeout(catalogTimer);
     loadRecipeCatalog($('#catalog-recipe-query').value,b.dataset.recipeCategory);
   });
   $('#home-recipe-search').addEventListener('submit',e=>{
     e.preventDefault();const q=$('#home-recipe-input').value.trim();
-    setTab('smart');
+    setTab('smart');setCatalogOpen(true);
     loadRecipeCatalog(q,'all');
     $('#recipe-catalog-anchor').scrollIntoView({behavior:'smooth',block:'start'});
     $('#catalog-recipe-query').focus({preventScroll:true});
@@ -2466,7 +2549,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
 
   // Layout event binding.
   [['#home-barcode','barcode'],['#home-receipt','receipt'],['#smart-barcode','barcode'],['#smart-receipt','receipt'],['#smart-expiry','expiry']].forEach(([sel,mode])=>$(sel).addEventListener('click',()=>openScan(mode)));
-  $('#smart-recipes').addEventListener('click',()=>$('#recipe-catalog-anchor').scrollIntoView({behavior:'smooth',block:'start'}));
+  $('#smart-recipes').addEventListener('click',()=>{setCatalogOpen(true,true);$('#recipe-catalog-anchor').scrollIntoView({behavior:'smooth',block:'start'});});
   $('#refresh-recipes').addEventListener('click',()=>{renderRecipes();showToast('Рекомендації оновлено за запасами');});
   $('#close-scan').addEventListener('click',closeScan);$('#scan-dialog').addEventListener('click',e=>{if(e.target===$('#scan-dialog'))closeScan();});
   $('#scan-dialog').addEventListener('close',()=>stopCamera());
@@ -2502,7 +2585,8 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   });
 
   save();render();
-  loadRecipeCatalog('', 'all');
+  // The large catalogue is intentionally unopened and unfetched until requested.
+  $('#catalog-status').textContent='Введи назву страви або обери категорію.';
   // Automatic on-open check for a small set of products only: no paid cron, no background polling.
   if(state.items.some(i=>/^\d{8,14}$/.test(i.barcode)))refreshMarketPrices(false);
   if(tg?.initData)syncNow(false);
