@@ -174,6 +174,155 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
     .recipe-suggestion textarea{width:100%;min-height:72px;resize:vertical;border:1.5px solid #302b26;border-radius:9px;background:white;padding:9px;font:inherit;font-size:12px;margin-top:8px}
     .recipe-suggestion button{margin-top:8px;background:var(--lemon);border:1.5px solid #1a1a1d;border-radius:9px;font-size:12px;font-weight:900;padding:10px}
     .recipe-suggestion small{display:block;margin-top:7px;color:#685d4d;font-size:10px;line-height:1.45}
+
+/* STYLE 2 — SOFT HOME. A quiet editorial pantry, not a pop-art recolour. */
+:root{--cozy-ink:#4c4654;--cozy-muted:#817a85;--cozy-cream:#faf7f1;--cozy-mint:#dceee6;--cozy-lilac:#e8dff5;--cozy-beige:#f1e7db;--cozy-blush:#f5e5e7;--cozy-line:#e9e1df}
+.header-tools{display:flex;align-items:center;gap:9px}
+.header-settings{width:41px;height:41px;display:grid;place-items:center;border:2.5px solid #19191c;border-radius:11px;background:#f4e8f8;color:#19191c;box-shadow:3px 3px 0 #19191c;padding:0;flex:none}
+.header-settings svg{width:21px;height:21px}
+.header-settings:focus-visible,.theme-choice:focus-visible,.cozy-category:focus-visible{outline:3px solid #9580b7;outline-offset:3px}
+.style-sheet{padding-bottom:25px}
+.style-intro{font-size:12px;color:#736e78;line-height:1.55;margin:-5px 0 17px}
+.theme-options{display:grid;gap:12px}
+.theme-choice{border:2px solid #302d32;background:white;padding:11px;text-align:left;border-radius:15px;display:flex;gap:13px;align-items:center;min-height:106px;color:#26252c;cursor:pointer}
+.theme-choice[aria-pressed="true"]{outline:3px solid #c6b8dd;outline-offset:2px}
+.theme-choice .style-preview{width:96px;height:82px;display:block;flex:none;border-radius:11px;position:relative;overflow:hidden}
+.style-preview.pop{border:2px solid #202022;background:#ffe99c;box-shadow:3px 3px 0 #202022}
+.style-preview.pop:before{content:"";position:absolute;width:35px;height:35px;top:11px;left:9px;background:#bce8db;border:2px solid #202022;border-radius:4px;box-shadow:38px 13px 0 #f7bdd2}
+.style-preview.pop:after{content:"";position:absolute;left:9px;bottom:11px;width:72px;height:9px;background:#d9c6f8;border:2px solid #202022;border-radius:4px}
+.style-preview.cozy{background:#fbf6ee;border:1px solid #efe7e1;box-shadow:0 8px 18px rgba(100,80,105,.12)}
+.style-preview.cozy:before{content:"";position:absolute;left:11px;right:11px;top:12px;height:26px;background:linear-gradient(115deg,#cce8dd,#e7d9ef);border-radius:14px}
+.style-preview.cozy:after{content:"";position:absolute;left:11px;right:11px;bottom:13px;height:21px;background:linear-gradient(90deg,#eee0d5 0 30%,transparent 30% 36%,#e8e0f3 36% 66%,transparent 66% 72%,#daece3 72%);border-radius:11px}
+.theme-copy{flex:1;min-width:0}.theme-copy strong{display:block;font-size:14px;line-height:1.25}.theme-copy small{display:block;color:#79737b;font-size:11px;line-height:1.5;margin-top:5px}
+.theme-choice .theme-indicator{width:19px;height:19px;border-radius:50%;border:2px solid #a5a0ab;flex:none}
+.theme-choice[aria-pressed="true"] .theme-indicator{border:6px solid #766590}
+.theme-note{margin-top:16px;padding:12px 14px;background:#f6f0f9;border-radius:12px;font-size:11px;line-height:1.5;color:#665c72}
+.cozy-collection{display:none}
+body.theme-cozy{--ink:var(--cozy-ink);--ink2:var(--cozy-muted);--deep:#798e84;--paper:var(--cozy-cream);--white:#fffefd;--stroke:var(--cozy-line);--shadow:0 10px 26px rgba(99,85,101,.075);--mint:var(--cozy-mint);--lilac:var(--cozy-lilac);--peach:var(--cozy-beige);--pink:var(--cozy-blush);--lemon:#f4e9cc;--blue:#e4ecf0;color:var(--cozy-ink);background:#efeae8;font-family:ui-rounded,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body.theme-cozy .app{background:var(--cozy-cream);box-shadow:0 0 0 1px #eee6e1}
+body.theme-cozy .main{padding-left:20px;padding-right:20px}
+body.theme-cozy .top{padding:21px 0 22px}
+body.theme-cozy .brand{font-size:24px;font-weight:750;letter-spacing:-1px;color:#5a5961}
+body.theme-cozy .brand-dot{color:#bd9db8}
+body.theme-cozy .mark{background:#e3eee5;border:1px solid #d3e4da;box-shadow:none;border-radius:16px;color:#728e85;width:43px;height:43px}
+body.theme-cozy .header-settings,body.theme-cozy .top-right{background:#fffdfc;border:1px solid #ece2e2;border-radius:15px;box-shadow:0 4px 12px rgba(92,82,96,.05);color:#706674;height:41px}
+body.theme-cozy #header-qr{min-width:41px;width:41px;padding:0}
+body.theme-cozy #header-qr span{display:none}
+body.theme-cozy .home-intro{margin-bottom:21px}
+body.theme-cozy .eyebrow{font-size:11px;letter-spacing:.5px;color:#a18f9b;text-transform:capitalize;font-weight:700}
+body.theme-cozy .page-title{font-size:clamp(34px,9vw,43px);font-weight:780;line-height:1.11;letter-spacing:-1.65px;color:#57505f}
+body.theme-cozy .title-accent{background:none;color:#8f8a9e;padding:0}
+body.theme-cozy .intro{color:#8d8690;font-weight:500;font-size:13px}
+body.theme-cozy .hero{background:linear-gradient(115deg,#dceee4 0%,#e3f0e9 52%,#efebe8 100%);border:1px solid #d8e9df;box-shadow:0 13px 28px rgba(123,155,139,.15);border-radius:26px;padding:23px 20px 17px;overflow:hidden;margin-bottom:21px;color:#4b5f58}
+body.theme-cozy .hero:before{content:"";width:168px;height:168px;border-radius:50%;position:absolute;top:-76px;right:-68px;border:25px solid rgba(255,255,255,.21)}
+body.theme-cozy .hero-label{color:#668075;font-weight:700;font-size:12px}
+body.theme-cozy .hero-number{font-weight:800;font-size:62px;letter-spacing:-3px;margin:9px 0 0}
+body.theme-cozy .hero-measure{font-size:13px;font-weight:600;color:#6a867b}
+body.theme-cozy .hero-unit{color:#819b8f;font-weight:500;font-size:11px}
+body.theme-cozy .hero-illustration{font-size:76px;text-shadow:none;color:#aacaba;opacity:.75;transform:none;margin-right:6px}
+body.theme-cozy .hero-stats{margin-top:20px}
+body.theme-cozy .mini-stat{border:1px solid #e5eee7;background:rgba(255,255,255,.7);border-radius:15px;box-shadow:none;color:#51685d;font-weight:600;white-space:normal;min-height:52px}
+body.theme-cozy .mini-stat b{font-size:15px}
+body.theme-cozy .mini-symbol{color:#96a89d;font-weight:600}
+body.theme-cozy .stat-arrow{color:#95b09f}
+body.theme-cozy .home-actions{grid-template-columns:minmax(0,1fr) 57px;margin:17px 0 23px}
+body.theme-cozy .action-add,body.theme-cozy .action-cart{border:0;box-shadow:0 7px 20px rgba(134,109,138,.11);border-radius:18px;height:56px;color:#5e5468;background:#e6dcf1;font-weight:700}
+body.theme-cozy .action-cart{background:#f5e5e6;color:#927481}
+body.theme-cozy .action-icon{border:0;background:rgba(255,255,255,.7);color:#8d779e;border-radius:13px;font-weight:500}
+body.theme-cozy .action-arrow{color:#947da5;font-weight:600}
+body.theme-cozy .smart-actions{gap:10px;margin-bottom:16px}
+body.theme-cozy .smart-trigger{border:1px solid #e7e3ea;box-shadow:none;background:#fffefb;border-radius:17px;font-size:12px;font-weight:680;color:#686270;min-height:73px}
+body.theme-cozy .smart-trigger:nth-child(2){background:#f8eee7;border-color:#f1e3dc}
+body.theme-cozy .smart-trigger .big{color:#a28ea7}
+body.theme-cozy .home-recipe-search{border:1px solid #e8dfeb;background:#eee8f4;box-shadow:none;border-radius:22px;padding:16px 15px;margin:15px 0 27px}
+body.theme-cozy .home-recipe-search label{font-size:14px;font-weight:750;color:#73647c}
+body.theme-cozy .home-recipe-controls input{border:1px solid #e6deea;border-radius:13px;min-height:43px;font-size:12px}
+body.theme-cozy .home-recipe-controls button{border:0;border-radius:13px;background:#cfe4d6;color:#617f70;font-weight:750}
+body.theme-cozy .home-recipe-search small{color:#8b8091}
+body.theme-cozy .folders-title,body.theme-cozy #folder-grid{display:none}
+body.theme-cozy .cozy-collection{display:block;margin:8px 0 25px}
+body.theme-cozy .cozy-caption{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px}
+body.theme-cozy .cozy-caption strong{font-size:19px;letter-spacing:-.5px;font-weight:760;color:#61576b}
+body.theme-cozy .cozy-caption small{font-size:11px;color:#9b909e}
+body.theme-cozy .cozy-categories{display:flex;gap:10px;margin:0 -20px;padding:3px 20px 15px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none}
+body.theme-cozy .cozy-categories::-webkit-scrollbar{display:none}
+body.theme-cozy .cozy-category{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;flex:none;width:92px;min-height:117px;padding:13px 7px 10px;gap:7px;border:1px solid #eee7e5;border-radius:21px;background:#fffdfa;box-shadow:0 6px 13px rgba(92,83,102,.04);color:#766c79;scroll-snap-align:start;cursor:pointer}
+body.theme-cozy .cozy-category.active{background:#f0eaf7;border-color:#dcd0e9;box-shadow:0 7px 16px rgba(138,117,161,.11);color:#655475}
+body.theme-cozy .cozy-category .cozy-symbol{height:43px;width:43px;display:grid;place-items:center;background:#e5f1e9;border-radius:50%;font-size:23px}
+body.theme-cozy .cozy-category[data-cozy-category="all"] .cozy-symbol{background:#e9e2f2;color:#81759b}
+body.theme-cozy .cozy-category[data-cozy-category="fruit"] .cozy-symbol{background:#dcefe4}
+body.theme-cozy .cozy-category[data-cozy-category="meat"] .cozy-symbol{background:#fae8e9}
+body.theme-cozy .cozy-category[data-cozy-category="bakery"] .cozy-symbol{background:#f5e9da}
+body.theme-cozy .cozy-category[data-cozy-category="other"] .cozy-symbol{background:#eae8ef}
+body.theme-cozy .cozy-category .cozy-label{font-size:10px;font-weight:700;line-height:1.16;text-align:center;min-height:23px}
+body.theme-cozy .cozy-category .cozy-count{font-size:10px;color:#9d8da1;font-weight:700}
+body.theme-cozy .section-heading{font-size:18px;font-weight:750;color:#63596d;letter-spacing:-.45px}
+body.theme-cozy .inventory-title{margin-bottom:8px}
+body.theme-cozy .text-btn{font-size:12px;font-weight:700;color:#947da6}
+body.theme-cozy #filters{display:none}
+body.theme-cozy .search{border:1px solid #e9e4e2;box-shadow:none;border-radius:16px;background:#fff;min-height:48px}
+body.theme-cozy .search input{font-size:12px}
+body.theme-cozy .item,body.theme-cozy .buy-item,body.theme-cozy .expiry-card{border:1px solid #eee7e6;border-radius:19px;background:#fff;box-shadow:0 4px 17px rgba(115,99,114,.035);padding:13px 11px}
+body.theme-cozy .food-icon{border-radius:15px;background:#f2eefa}
+body.theme-cozy .item-name{font-weight:760;color:#514c58}
+body.theme-cozy .item-sub{color:#a196a0}
+body.theme-cozy .status.warn{color:#bb8550}
+body.theme-cozy .status.danger{color:#bc6b74}
+body.theme-cozy .quantity button{background:#f2ecef;color:#87718f;border-radius:10px}
+body.theme-cozy .quantity button.plus{background:#dceee5;color:#5c846d}
+body.theme-cozy .quantity-val{color:#5d5366}
+body.theme-cozy .action-wide{background:#e8ece6;border:1px dashed #cbded0;color:#668574;box-shadow:none;border-radius:17px}
+body.theme-cozy .nav{background:rgba(255,252,248,.96);border-top:1px solid #eee8e4;box-shadow:0 -9px 28px rgba(126,100,129,.06);padding-top:11px}
+body.theme-cozy .nav button{font-size:10px;color:#a69ca5;font-weight:650;border-radius:15px}
+body.theme-cozy .nav button.active{color:#75678c;background:#ece5f3}
+body.theme-cozy .nav button.active:before{display:none}
+body.theme-cozy .nav button svg{stroke-width:1.7}
+body.theme-cozy .nav .count-badge{background:#eecbd7;color:#72556b}
+body.theme-cozy .shopping-hero{background:#e9e1f0;border:1px solid #e2d7ea;border-radius:26px;box-shadow:none;color:#695c76}
+body.theme-cozy .copy-shopping{border:1px solid #e3d2e8;border-radius:12px;box-shadow:none;background:#fff}
+body.theme-cozy .subbar{color:#8b8390;letter-spacing:.5px;font-weight:750}
+body.theme-cozy .inline-form{border:1px solid #e9e1e5;box-shadow:none}
+body.theme-cozy .inline-form button,body.theme-cozy .primary{background:#a79bbb;color:white;border:0;border-radius:15px;font-weight:750;box-shadow:none}
+body.theme-cozy .tip,body.theme-cozy .weekly-menu-home{background:#ecede6;border:1px solid #dce8de;box-shadow:none;border-radius:20px}
+body.theme-cozy .assist-tile{border:1px solid #e9e4e6;box-shadow:none;background:#e8f1eb;border-radius:20px;color:#625c65}
+body.theme-cozy .assist-tile:nth-child(2){background:#ece5f3}body.theme-cozy .assist-tile:nth-child(3){background:#f5ede3}body.theme-cozy .assist-tile:nth-child(4){background:#f1e8ed}
+body.theme-cozy .assist-tile strong{font-weight:750}
+body.theme-cozy .assist-tile small{color:#7b727e;font-weight:500}
+body.theme-cozy .smart-panel,body.theme-cozy .recipe,body.theme-cozy .qr-panel{border:1px solid #e9e3e5;border-radius:21px;background:#fffefd;box-shadow:0 5px 20px rgba(95,81,102,.04)}
+body.theme-cozy .smart-panel h3{font-weight:750;color:#5e5664}
+body.theme-cozy .badge-source{border:0;border-radius:12px;background:#eee6f4;color:#78698e;font-weight:750;padding:5px 9px}
+body.theme-cozy .smart-input,body.theme-cozy .field,body.theme-cozy .form-group input,body.theme-cozy .form-group select{border:1px solid #e9e1e8;border-radius:14px;background:#fff}
+body.theme-cozy .catalog-toggle{border-radius:21px;background:transparent}
+body.theme-cozy .catalog-toggle strong{font-weight:750;color:#5c5365}
+body.theme-cozy .catalog-toggle .toggle-glyph{background:#ece5f3;border:0;border-radius:50%;color:#8a749b}
+body.theme-cozy .catalog-categories button{border:1px solid #e9deeb;background:#fff;border-radius:16px}
+body.theme-cozy .catalog-categories button.active{background:#eee3f3;border-color:#cdb9dd;box-shadow:none}
+body.theme-cozy .catalog-result{border:1px solid #ece5e6;border-radius:15px}
+body.theme-cozy .catalog-more{border:0;border-radius:15px;background:#e5efea;color:#597767}
+body.theme-cozy .recipe-suggestion{background:#f5f0e8;border:1px solid #e9ddd4;border-radius:17px}
+body.theme-cozy .recipe-suggestion textarea{border:1px solid #e3dcd9;border-radius:13px}
+body.theme-cozy .recipe-suggestion button{border:0;border-radius:12px;background:#dce9df;color:#526e5c}
+body.theme-cozy .summary-box{border:1px solid #e9e4e6;border-radius:19px;background:#f5eced}
+body.theme-cozy .summary-box:nth-child(2){background:#e9f1ea}
+body.theme-cozy .sync-actions button,body.theme-cozy .sync-link,body.theme-cozy .outline-small,body.theme-cozy .recipe-actions button{border:1px solid #e7ddea;background:#eee6f5;color:#695879;border-radius:13px;font-weight:700}
+body.theme-cozy .toast{background:#72677e}
+body.theme-cozy dialog{background:#fbf8f4;color:#534b5c;border-radius:27px;box-shadow:0 18px 70px rgba(69,48,79,.2)}
+body.theme-cozy dialog::backdrop{background:rgba(52,43,60,.33)}
+body.theme-cozy .sheet-header h2{font-weight:750;color:#65546d}
+body.theme-cozy .close{background:#f0e9f3;color:#806e90;border:0}
+body.theme-cozy .field-label,body.theme-cozy .form-group label{color:#776a7c;font-weight:700}
+body.theme-cozy .photo-control,body.theme-cozy .photo-result{border:1px solid #eee4e7;border-radius:15px}
+body.theme-cozy .recipe-ingredient{border:1px solid #efe8e8;border-radius:14px}
+body.theme-cozy .recipe-detail-cost{background:#f5f0ec;color:#766a78}
+body.theme-cozy .smart-output{background:#f1edf6;border:1px solid #e3d7e9}
+body.theme-cozy button:focus-visible{outline-color:#ac96c6}
+@media(max-width:365px){
+  .header-tools{gap:6px}.header-settings{width:38px;height:40px}
+  body.theme-cozy .cozy-categories{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}
+  body.theme-cozy .cozy-category{width:85px}
+  body.theme-cozy .main{padding-left:14px;padding-right:14px}
+}
+@media print{.header-settings,.cozy-collection{display:none!important}}
 </style>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -182,11 +331,11 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
   <main class="main">
     <header class="top">
       <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M5 10.5h14M9 6v2M9 14v3"/></svg></span><span>поличка<span class="brand-dot">.</span></span></div>
-      <button type="button" class="top-right" id="header-qr" aria-label="Відкрити QR-код"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM15 14v3m3-3h3v3m-7 4h3m4-2v2m-4-3h2" stroke-linejoin="round"/></svg><span>Мій QR</span></button>
+      <div class="header-tools"><button type="button" id="header-settings" class="header-settings" aria-label="Налаштування оформлення" title="Налаштування"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.1v2M12 18.9v2M4.3 7.2l1.8 1M17.9 15.8l1.8 1M4.3 16.8l1.8-1M17.9 8.2l1.8-1"/><circle cx="12" cy="12" r="4.1"/><path d="M8.6 3.9a9 9 0 0 1 6.8 0M8.6 20.1a9 9 0 0 0 6.8 0"/></svg></button><button type="button" class="top-right" id="header-qr" aria-label="Відкрити QR-код"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM15 14v3m3-3h3v3m-7 4h3m4-2v2m-4-3h2" stroke-linejoin="round"/></svg><span>Мій QR</span></button></div>
     </header>
 
     <section id="screen-stock" class="section active" aria-label="Запаси">
-      <div class="home-intro"><p class="eyebrow" id="today-label">Ваші продукти</p><h1 class="page-title">Усе під<br><span class="title-accent">контролем.</span></h1><p class="intro">Знаєш, що є вдома. Купуєш тільки потрібне.</p></div>
+      <div class="home-intro"><p class="eyebrow" id="today-label">Ваші продукти</p><h1 class="page-title"><span id="home-title-main">Усе під</span><br><span class="title-accent" id="home-title-accent">контролем.</span></h1><p class="intro" id="home-subtitle">Знаєш, що є вдома. Купуєш тільки потрібне.</p></div>
       <div class="hero"><div class="hero-top"><div><p class="hero-label">Зараз у холодильнику</p><div class="hero-number"><span id="hero-count">0</span><span class="hero-measure">продуктів</span></div><div class="hero-unit" id="hero-unit">найменувань у списку</div></div><span class="hero-illustration" aria-hidden="true">❋</span></div><div class="hero-stats"><button class="mini-stat" id="hero-shopping-shortcut" type="button"><span class="mini-symbol">↗</span><span><b id="hero-need">0</b> докупити</span><span class="stat-arrow">→</span></button><button class="mini-stat" id="hero-expiry-shortcut" type="button"><span class="mini-symbol">◷</span><span><b id="hero-expiry">0</b> скоро спливе</span><span class="stat-arrow">→</span></button></div></div>
       <div class="home-actions"><button type="button" class="action-add" id="home-add"><span class="action-icon">＋</span><span>Додати продукт</span><span class="action-arrow">↗</span></button><button type="button" class="action-cart" id="home-shopping" aria-label="Відкрити покупки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M3 5h2l2.6 11h10.5l2.1-8H6M9 20h.01M17 20h.01" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="smart-actions"><button class="smart-trigger" id="home-barcode" type="button"><span class="big">▥</span><span>Сканувати<br>штрихкод</span></button><button class="smart-trigger" id="home-receipt" type="button"><span class="big">▤</span><span>Зчитати<br>чек</span></button></div>
@@ -198,6 +347,17 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
         <button type="button" class="folder-card meat" data-folder="meat"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🍗</span><span class="folder-count" data-folder-count="meat">0</span></span><span class="folder-name">М’ясо та риба</span><span class="folder-arrow">↗</span></button>
         <button type="button" class="folder-card bakery" data-folder="bakery"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🥐</span><span class="folder-count" data-folder-count="bakery">0</span></span><span class="folder-name">Хліб та випічка</span><span class="folder-arrow">↗</span></button>
         <button type="button" class="folder-card other" data-folder="other"><span class="folder-tab"></span><span class="folder-meta"><span class="folder-icon">🫙</span><span class="folder-count" data-folder-count="other">0</span></span><span class="folder-name">Інше</span><span class="folder-arrow">↗</span></button>
+      </div>
+      <div class="cozy-collection" id="cozy-collection" aria-label="Категорії продуктів у пастельному стилі">
+        <div class="cozy-caption"><strong>Мої продукти</strong><small>За категоріями</small></div>
+        <div class="cozy-categories" id="cozy-categories">
+          <button type="button" class="cozy-category active" data-cozy-category="all" aria-pressed="true"><span class="cozy-symbol" aria-hidden="true">✿</span><span class="cozy-label">Усе вдома</span><span class="cozy-count" data-cozy-count="all">0</span></button>
+          <button type="button" class="cozy-category" data-cozy-category="dairy" aria-pressed="false"><span class="cozy-symbol" aria-hidden="true">🥛</span><span class="cozy-label">Молочне</span><span class="cozy-count" data-cozy-count="dairy">0</span></button>
+          <button type="button" class="cozy-category" data-cozy-category="fruit" aria-pressed="false"><span class="cozy-symbol" aria-hidden="true">🥑</span><span class="cozy-label">Овочі й фрукти</span><span class="cozy-count" data-cozy-count="fruit">0</span></button>
+          <button type="button" class="cozy-category" data-cozy-category="meat" aria-pressed="false"><span class="cozy-symbol" aria-hidden="true">🍗</span><span class="cozy-label">М’ясо й риба</span><span class="cozy-count" data-cozy-count="meat">0</span></button>
+          <button type="button" class="cozy-category" data-cozy-category="bakery" aria-pressed="false"><span class="cozy-symbol" aria-hidden="true">🥐</span><span class="cozy-label">Випічка</span><span class="cozy-count" data-cozy-count="bakery">0</span></button>
+          <button type="button" class="cozy-category" data-cozy-category="other" aria-pressed="false"><span class="cozy-symbol" aria-hidden="true">🫙</span><span class="cozy-label">Інше</span><span class="cozy-count" data-cozy-count="other">0</span></button>
+        </div>
       </div>
       <div class="between inventory-title"><h2 class="section-heading">Продукти <span id="inventory-label">· усі</span></h2><button type="button" class="text-btn" id="open-add-top">+ Додати</button></div>
       <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><input id="search-products" placeholder="Знайти продукт..." autocomplete="off" aria-label="Пошук продукту" /></label>
@@ -254,6 +414,14 @@ dialog{background:var(--paper);border:2.5px solid var(--ink);border-radius:19px;
     <button data-tab="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM15 14v3m3-3h3v3m-7 4h3m4-2v2m-4-3h2" stroke-linejoin="round"/></svg>QR-код</button>
   </nav>
 </div>
+<dialog id="settings-dialog" aria-labelledby="settings-title"><div class="sheet style-sheet">
+  <div class="sheet-header"><h2 id="settings-title">Оформлення Полички</h2><button type="button" class="close" id="settings-close" aria-label="Закрити налаштування">×</button></div>
+  <p class="style-intro">Обирай свій стиль. Продукти, рецепти, покупки та терміни залишаються спільними.</p>
+  <div class="theme-options" role="group" aria-label="Стиль інтерфейсу">
+    <button type="button" class="theme-choice" data-theme-choice="classic" aria-pressed="true"><span class="style-preview pop" aria-hidden="true"></span><span class="theme-copy"><strong>Стиль 1 · Попарт</strong><small>Яскраві кольори, графічні рамки, папки.</small></span><span class="theme-indicator" aria-hidden="true"></span></button>
+    <button type="button" class="theme-choice" data-theme-choice="cozy" aria-pressed="false"><span class="style-preview cozy" aria-hidden="true"></span><span class="theme-copy"><strong>Стиль 2 · Ніжний</strong><small>М’ята, беж, бузковий. Затишний планер і стрічка категорій.</small></span><span class="theme-indicator" aria-hidden="true"></span></button>
+  </div><p class="theme-note">Вибір зберігається на цьому пристрої окремо для Telegram-акаунта. Він не змінює оформлення іншої людини.</p>
+</div></dialog>
 <dialog id="product-dialog" aria-labelledby="dialog-title"><div class="sheet"><div class="sheet-header"><h2 id="dialog-title">Новий продукт</h2><button class="close" id="close-dialog" aria-label="Закрити" type="button">×</button></div><form id="product-form"><div class="form-grid"><div class="form-group full"><label for="f-name">Назва продукту</label><input id="f-name" required maxlength="65" placeholder="Наприклад, молоко" autocomplete="off"/></div><div class="form-group full"><label for="f-category">Категорія</label><select id="f-category"><option value="dairy">Молочне</option><option value="fruit">Овочі і фрукти</option><option value="meat">М'ясо та риба</option><option value="bakery">Хліб і випічка</option><option value="other">Інше</option></select></div><div class="form-group"><label for="f-qty">Зараз є</label><input id="f-qty" type="number" min="0" max="100000" step="any" required value="1"/></div><div class="form-group"><label for="f-unit">Одиниця виміру</label><select id="f-unit"><option value="шт">шт</option><option value="уп.">уп.</option><option value="л">л</option><option value="кг">кг</option><option value="г">г</option></select></div><div class="form-group"><label for="f-min">Коли нагадати купити</label><input id="f-min" type="number" min="0" max="100000" step="any" required value="1"/><p class="form-help">Додати у покупки, коли залишиться стільки або менше.</p></div><div class="form-group"><label for="f-target">Скільки хочеш мати</label><input id="f-target" type="number" min="0.01" max="100000" step="any" required value="3"/><p class="form-help">До цього рівня поповнимо запас після покупки.</p></div><div class="form-group full"><label for="f-expiry">Придатний до (необов'язково)</label><input id="f-expiry" type="date"/></div>
       <div class="form-group"><label for="f-price">Ціна за одиницю, €</label><input id="f-price" type="number" step="0.01" min="0" max="100000" placeholder="0.00"/></div>
       <div class="form-group"><label for="f-place">Де зберігається</label><select id="f-place"><option value="fridge">Холодильник</option><option value="freezer">Морозилка</option><option value="pantry">Комора</option></select></div>
@@ -1531,6 +1699,30 @@ window.InlineQRCode=req('index');
   const CATS={dairy:{label:'Молочне',emoji:'🥛'},fruit:{label:'Овочі і фрукти',emoji:'🥬'},meat:{label:'М’ясо та риба',emoji:'🍗'},bakery:{label:'Хліб і випічка',emoji:'🥖'},other:{label:'Інше',emoji:'🫙'}};
   const $ = s=>document.querySelector(s); const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const tg=window.Telegram?.WebApp;
+  // Theme is intentionally separate from the household state and cloud sync.
+  // Telegram ID only scopes a cosmetic local preference (not authorization).
+  const themeAccountId=String(tg?.initDataUnsafe?.user?.id||'guest');
+  const THEME_KEY='polychka_visual_theme_v1_'+(/^[0-9]{1,20}$/.test(themeAccountId)?themeAccountId:'guest');
+  let activeTheme='classic';
+  try{activeTheme=localStorage.getItem(THEME_KEY)==='cozy'?'cozy':'classic';}catch(e){}
+  document.body.classList.toggle('theme-cozy',activeTheme==='cozy');
+  function applyVisualTheme(name,persist=true){
+    activeTheme=name==='cozy'?'cozy':'classic';
+    document.body.classList.toggle('theme-cozy',activeTheme==='cozy');
+    $('#home-title-main').textContent=activeTheme==='cozy'?'Усе на':'Усе під';
+    $('#home-title-accent').textContent=activeTheme==='cozy'?'своєму місці.':'контролем.';
+    $('#home-subtitle').textContent=activeTheme==='cozy'?'Маленькі турботи, що роблять дім затишнішим.':'Знаєш, що є вдома. Купуєш тільки потрібне.';
+    document.querySelectorAll('[data-theme-choice]').forEach(button=>{
+      button.setAttribute('aria-pressed',String(button.dataset.themeChoice===activeTheme));
+    });
+    if(persist){try{localStorage.setItem(THEME_KEY,activeTheme);}catch(e){showToast('Не вдалося зберегти стиль на цьому пристрої');}}
+    try{
+      tg?.setHeaderColor?.(activeTheme==='cozy'?'#faf7f1':'#fffdf8');
+      tg?.setBackgroundColor?.(activeTheme==='cozy'?'#faf7f1':'#fffdf8');
+    }catch(e){}
+  }
+  applyVisualTheme(activeTheme,false);
+
   const nowLocal = ()=> {const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate());};
   const dateAhead = d => {const n=nowLocal();n.setDate(n.getDate()+d);return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;};
   const uid=()=> {if (globalThis.crypto?.randomUUID) return crypto.randomUUID(); return `${Date.now()}_${Math.random().toString(36).slice(2)}`;};
@@ -1669,7 +1861,8 @@ window.InlineQRCode=req('index');
   }
   function renderStock(){let items=state.items.filter(i=>(filter==='all'||i.category===filter)&&i.name.toLowerCase().includes($('#search-products').value.trim().toLowerCase()));items.sort((a,b)=>Number(low(b))-Number(low(a)) || Number(a.qty===0)-Number(b.qty===0) || a.name.localeCompare(b.name,'uk'));
     $('#stock-list').innerHTML=items.length?items.map(productMarkup).join(''):`<div class="empty"><div class="empty-illustration">🥬</div><b>Тут поки порожньо</b><p>${state.items.length?'За цим пошуком продуктів немає.':'Додай свій перший продукт — і починай вести запаси.'}</p></div>`;
-    document.querySelectorAll('[data-folder-count]').forEach(e=>{const cat=e.dataset.folderCount;e.textContent=state.items.filter(i=>cat==='all'||i.category===cat).length;});document.querySelectorAll('[data-folder]').forEach(b=>{const selected=b.dataset.folder===filter;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});$('#inventory-label').textContent='· '+(filter==='all'?'усі':CATS[filter].label.toLowerCase());$('#hero-count').textContent=state.items.filter(i=>i.qty>0).length;$('#hero-unit').textContent=`із ${state.items.length} найменувань у списку`;$('#hero-need').textContent=restock().length;$('#hero-expiry').textContent=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=3).length;
+    document.querySelectorAll('[data-folder-count],[data-cozy-count]').forEach(e=>{const cat=e.dataset.folderCount||e.dataset.cozyCount;e.textContent=state.items.filter(i=>cat==='all'||i.category===cat).length;});
+    document.querySelectorAll('[data-cozy-category]').forEach(b=>{const yes=b.dataset.cozyCategory===filter;b.classList.toggle('active',yes);b.setAttribute('aria-pressed',String(yes));});document.querySelectorAll('[data-folder]').forEach(b=>{const selected=b.dataset.folder===filter;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});$('#inventory-label').textContent='· '+(filter==='all'?'усі':CATS[filter].label.toLowerCase());$('#hero-count').textContent=state.items.filter(i=>i.qty>0).length;$('#hero-unit').textContent=`із ${state.items.length} найменувань у списку`;$('#hero-need').textContent=restock().length;$('#hero-expiry').textContent=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=3).length;
     [...$('#filters').children].forEach(b=>{b.classList.toggle('active',b.dataset.filter===filter);b.setAttribute('aria-pressed',b.dataset.filter===filter?'true':'false');});
   }
   function shoppingMarkupAuto(i){const need=precision(i.target-i.qty);return `<article class="buy-item"><button class="buy-check" type="button" data-action="bought" data-id="${esc(i.id)}" aria-label="Куплено: ${esc(i.name)}">✓</button>${productPicture(i)}<div class="buy-info"><b>${esc(i.name)}</b><p>Є: ${fmt(i.qty)} ${esc(i.unit)}</p></div><span class="pill">+${fmt(need)} ${esc(i.unit)}</span></article>`;}
@@ -1828,6 +2021,20 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   function changeQty(item,dir){item.qty=precision(Math.max(0,item.qty+dir*unitStep(item)));logAction(`${dir>0?'+':'−'} ${item.name}: ${fmt(item.qty)} ${item.unit}`);save();render();}
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
   $('#header-qr').addEventListener('click',()=>setTab('qr'));
+  $('#header-settings').addEventListener('click',()=>$('#settings-dialog').showModal());
+  $('#settings-close').addEventListener('click',()=>$('#settings-dialog').close());
+  $('#settings-dialog').addEventListener('click',e=>{if(e.target===$('#settings-dialog'))e.target.close();});
+  document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>{
+    applyVisualTheme(button.dataset.themeChoice);
+    renderStock();
+  }));
+  $('#cozy-categories').addEventListener('click',event=>{
+    const button=event.target.closest('[data-cozy-category]');
+    if(!button)return;
+    filter=button.dataset.cozyCategory;
+    renderStock();
+    $('.inventory-title').scrollIntoView({behavior:'smooth',block:'start'});
+  });
   $('#hero-shopping-shortcut').addEventListener('click',()=>setTab('shopping'));
   $('#hero-expiry-shortcut').addEventListener('click',()=>setTab('plan'));
   $('#home-shopping').addEventListener('click',()=>setTab('shopping'));
@@ -1835,7 +2042,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   $('#folder-grid').addEventListener('click',e=>{const b=e.target.closest('[data-folder]');if(!b)return;filter=b.dataset.folder;renderStock();document.querySelector('.inventory-title').scrollIntoView({behavior:'smooth',block:'start'});});
   $('#copy-shopping').addEventListener('click',async()=>{const entries=[...restock().map(i=>`${i.name} — ${fmt(precision(i.target-i.qty))} ${i.unit}`),...state.shopping.map(i=>i.name)];if(!entries.length){showToast('Список покупок порожній');return;}const val='🛒 Список покупок\n'+entries.map(i=>'• '+i).join('\n');try{await navigator.clipboard.writeText(val);showToast('Список скопійовано');}catch(e){const t=document.createElement('textarea');t.value=val;t.style.position='fixed';t.style.opacity='0';document.body.append(t);t.select();const ok=document.execCommand('copy');t.remove();showToast(ok?'Список скопійовано':'Не вдалося скопіювати');}});
   // Telegram Mini App UI hooks; the server verifies initData before syncing.
-  if(tg){try{tg.ready();tg.expand();tg.setHeaderColor?.('#fffdf8');tg.setBackgroundColor?.('#fffdf8');document.documentElement.classList.add('telegram-app');document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>tg.HapticFeedback?.selectionChanged?.(),{passive:true}));}catch(e){}}
+  if(tg){try{tg.ready();tg.expand();tg.setHeaderColor?.(activeTheme==='cozy'?'#faf7f1':'#fffdf8');tg.setBackgroundColor?.(activeTheme==='cozy'?'#faf7f1':'#fffdf8');document.documentElement.classList.add('telegram-app');document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>tg.HapticFeedback?.selectionChanged?.(),{passive:true}));}catch(e){}}
 
   let notificationsEnabled=true;
   function setSyncStatus(message,error=false){const el=$('#sync-status');if(!el)return;el.textContent=message;el.classList.toggle('error',error);$('#sync-badge').textContent=error?'ОФЛАЙН':syncReady?'СИНХРОНІЗОВАНО':'TELEGRAM';}
