@@ -2513,7 +2513,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     if(added)setTab('shopping');
   });
   $('#catalog-toggle').addEventListener('click',()=>{
-    setCatalogOpen($('#catalog-body').hidden,!$('#catalog-body').hidden);
+    const opening=$('#catalog-body').hidden;setCatalogOpen(opening,opening);
   });
   $('#catalog-load-more').addEventListener('click',()=>{
     catalogVisibleCount+=12;renderCatalogList();
