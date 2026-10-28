@@ -471,7 +471,7 @@ body.theme-cozy button:focus-visible{outline-color:#ac96c6}
     <p>Діють для спільного холодильника, добірок вечері, пошуку рецептів і порад ШІ.</p>
     <label class="diet-choice"><input type="checkbox" id="diet-avoid-mushrooms" data-diet="avoidMushrooms" checked><span><strong>Майже без грибів</strong><small>Не пропонувати грибні страви автоматично.</small></span></label>
     <label class="diet-choice"><input type="checkbox" id="diet-avoid-frozen" data-diet="avoidFrozenVegetables" checked><span><strong>Без заморожених овочів</strong><small>Надавати перевагу свіжим, за потреби консервованим.</small></span></label>
-    <p>Пошук конкретної страви з цими продуктами залишається доступним, якщо захочеться виняток.</p>
+    <p>Також враховуються попередні побажання: без бобових, перцю, вівсянки, голубців, тушкованої капусти та сирого буряка. Пошук конкретної страви для винятку доступний.</p>
   </div>
 </div></dialog>
 <dialog id="product-dialog" aria-labelledby="dialog-title"><div class="sheet"><div class="sheet-header"><h2 id="dialog-title">Новий продукт</h2><button class="close" id="close-dialog" aria-label="Закрити" type="button">×</button></div><form id="product-form"><div class="form-grid"><div class="form-group full"><label for="f-name">Назва продукту</label><input id="f-name" required maxlength="65" placeholder="Наприклад, молоко" autocomplete="off"/></div><div class="form-group full"><label for="f-category">Категорія</label><select id="f-category"><option value="dairy">Молочне</option><option value="fruit">Овочі і фрукти</option><option value="meat">М'ясо та риба</option><option value="bakery">Хліб і випічка</option><option value="other">Інше</option></select></div><div class="form-group"><label for="f-qty">Зараз є</label><input id="f-qty" type="number" min="0" max="100000" step="any" required value="1"/></div><div class="form-group"><label for="f-unit">Одиниця виміру</label><select id="f-unit"><option value="шт">шт</option><option value="уп.">уп.</option><option value="л">л</option><option value="кг">кг</option><option value="г">г</option></select></div><div class="form-group"><label for="f-min">Коли нагадати купити</label><input id="f-min" type="number" min="0" max="100000" step="any" required value="1"/><p class="form-help">Додати у покупки, коли залишиться стільки або менше.</p></div><div class="form-group"><label for="f-target">Скільки хочеш мати</label><input id="f-target" type="number" min="0.01" max="100000" step="any" required value="3"/><p class="form-help">До цього рівня поповнимо запас після покупки.</p></div><div class="form-group full"><label for="f-expiry">Придатний до (необов'язково)</label><input id="f-expiry" type="date"/></div>
@@ -2229,6 +2229,13 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   const DINNER_POOL=Array.isArray(window.PolychkaDinnerRecipes)?window.PolychkaDinnerRecipes:[];
   const DINNER_GROUPS=Array.from({length:5},(_,group)=>DINNER_POOL.filter(r=>r.group===group));
   const MUSHROOM_WORDS=/(?:гриб|печериц|шампіньйон|лисичк|глив|опеньк|трюфел|mushroom|champignon|shiitake|oyster\s+mushroom|pilz|trüffel)/iu;
+  // Existing household exclusions also apply to automatic recipe recommendations.
+  const LEGUMES=/(?:нут|квасол|горох|горош|сочевиц|chickpea|lentil|peas?|beans?|kichererbse|bohnen|erbsen)/iu;
+  const PEPPERS=/(?:перець|перцю|перцем|паприк|paprika|pepper|chili|chilli|capsicum|jalapeño)/iu;
+  const OATMEAL=/(?:вівсян|овсян|oatmeal|haferflock)/iu;
+  const CABBAGE_STEW=/(?:голубц|тушкован.{0,20}капуст|тушен.{0,20}капуст|braised cabbage)/iu;
+  const RAW_BEET=/(?:сир(?:ий|а|ого).{0,15}буряк|буряк.{0,15}сир(?:ий|а|им)|raw beet)/iu;
+  const FIXED_AVOID=[LEGUMES,PEPPERS,OATMEAL,CABBAGE_STEW,RAW_BEET];
   const FREEZER_WORDS=/(?:заморож|морожен|frozen|tiefkühl|tiefgefror|\btk[\s-])/iu;
   const VEGETABLE_WORDS=/(?:овоч|суміш\s+овочів|брокол|моркв|шпинат|капуст|горош|горох|квасол|цвітн|перець|кукурудз|vegetable|broccoli|spinach|peas|carrots|mixed\s+veg|gemüse|erbsen|bohnen)/iu;
   function frozenVegMention(value){
@@ -2238,6 +2245,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   function disfavoredRecipe(recipe,query=''){
     const names=[recipe?.name_uk||'',...(recipe?.ingredients||[]).map(x=>x.name||''),...(recipe?.steps||[])];
     const text=names.join(' ');
+    if(FIXED_AVOID.some(rx=>rx.test(text)&&!rx.test(query)))return true;
     if(state.settings?.avoidMushrooms!==false&&!MUSHROOM_WORDS.test(query)&&MUSHROOM_WORDS.test(text))return true;
     if(state.settings?.avoidFrozenVegetables!==false&&!frozenVegMention(query)&&names.some(frozenVegMention))return true;
     return false;
