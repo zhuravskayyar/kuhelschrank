@@ -324,6 +324,18 @@ body.theme-cozy button:focus-visible{outline-color:#ac96c6}
 }
 @media print{.header-settings,.cozy-collection{display:none!important}}
 
+  /* Shared meal preferences; neutral in both visual themes. */
+  .diet-settings{margin:20px 0 5px;padding-top:17px;border-top:1px solid #e7e0e6}
+  .diet-settings h3{margin:0 0 6px;font-size:15px;font-weight:850}
+  .diet-settings p{margin:0 0 13px;color:#746c78;font-size:11px;line-height:1.55}
+  .diet-choice{display:flex;align-items:center;gap:12px;padding:12px 10px;margin:8px 0;border:1.5px solid #e2dce5;border-radius:12px;background:#fff;cursor:pointer}
+  .diet-choice input{width:19px;height:19px;flex:none;accent-color:#8070ad;cursor:pointer}
+  .diet-choice span{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .diet-choice strong{color:#35303b;font-size:12px;font-weight:850}
+  .diet-choice small{color:#827a85;font-size:10px;line-height:1.4}
+  body.theme-cozy .diet-settings{border-top-color:#ece4e6}
+  body.theme-cozy .diet-choice{border:1px solid #eee4e7;border-radius:16px;background:#fffdfc}
+  body.theme-cozy .diet-choice input{accent-color:#88b6a0}
   /* Dinner of the day: compact, actionable cards, visually compatible with both themes. */
   .dinner-panel{padding:18px 15px 15px}
   .dinner-heading{margin:0 0 8px;align-items:center}
@@ -425,7 +437,7 @@ body.theme-cozy button:focus-visible{outline-color:#ac96c6}
         <button class="assist-tile" id="smart-recipes"><span class="glyph">♨</span><strong>Що приготувати</strong><small>Рецепти з твоїх продуктів</small></button>
       </div>
       <div class="smart-panel" id="weekly-menu-panel"><div class="between"><h3>Наше меню на тиждень</h3><span class="badge-source">НА ДВОХ</span></div><p class="smart-caption" id="weekly-menu-note">Одна повноцінна страва й один перекус. Не означає, що продукти вже куплені.</p><div id="weekly-menu-rows"></div><div id="weekly-menu-budget" class="smart-caption"></div></div><div class="smart-panel recipe-catalog" id="recipe-catalog-anchor"><button type="button" id="catalog-toggle" class="catalog-toggle" aria-expanded="false" aria-controls="catalog-body"><span><strong>Знайти страву</strong><small>Рецепти й інгредієнти · стандарт 2 порції</small></span><span class="toggle-glyph" aria-hidden="true">⌄</span></button><div id="catalog-body" hidden><p class="smart-caption">Введи назву страви — покажемо інгредієнти, які є вдома і які треба докупити. Дані цін показуємо тільки якщо маємо джерело.</p><label class="field-label" for="catalog-recipe-query">Пошук рецепта</label><input class="smart-input" id="catalog-recipe-query" type="search" placeholder="Борщ, деруни, олів'є…" maxlength="65" autocomplete="off"/><div class="catalog-categories" id="catalog-recipe-categories"><button type="button" data-recipe-category="all" class="active">Усі</button><button type="button" data-recipe-category="Супи">Супи</button><button type="button" data-recipe-category="Основні">Основні</button><button type="button" data-recipe-category="Салати">Салати</button><button type="button" data-recipe-category="Сніданки">Сніданки</button><button type="button" data-recipe-category="Випічка">Випічка</button></div><p class="smart-caption" id="catalog-status" role="status" aria-live="polite">Завантажуємо каталог рецептів…</p><div class="catalog-results" id="catalog-results"></div><button type="button" class="catalog-more" id="catalog-load-more" hidden>Показати більше рецептів</button><div id="catalog-suggestion" class="recipe-suggestion" hidden><p>Не знайшли цю страву? Залиш назву й, за бажанням, інгредієнти — додамо до черги поповнення каталогу.</p><label class="field-label" for="catalog-suggestion-ingredients">Інгредієнти (необов’язково)</label><textarea id="catalog-suggestion-ingredients" maxlength="600" placeholder="Картопля — 300 г, цибуля — 1 шт…"></textarea><button type="button" id="catalog-suggest">Запропонувати рецепт</button><small>Запит збережеться у базі після підтвердження Telegram-входу; рецепт не з’явиться автоматично без перевірки складу.</small></div></div></div><div class="smart-panel"><div class="between"><h3>Що варто зробити</h3><span class="badge-source">АВТО</span></div><div id="smart-insights"></div></div>
-      <div class="smart-panel dinner-panel" id="recipes-anchor"><div class="between dinner-heading"><div><span class="dinner-kicker">МЕНЮ ДНЯ</span><h3>5 ідей на вечерю</h3></div><span class="dinner-day" id="dinner-date">Сьогодні</span></div><p class="dinner-description">Не омлет із сиром. Щодня інші 5 страв із 40 авторських рецептів — від азійського воку до незвичайних запіканок.</p><div class="dinner-list" id="recipe-list" aria-label="П’ять страв на сьогодні"></div><p class="dinner-footnote">Нові ідеї після 00:00 за часом Німеччини. Натисни на страву, щоб побачити інгредієнти на 2 порції та додати відсутні у покупки. Перед готуванням перевір стан продуктів.</p></div>
+      <div class="smart-panel dinner-panel" id="recipes-anchor"><div class="between dinner-heading"><div><span class="dinner-kicker">МЕНЮ ДНЯ</span><h3>5 ідей на вечерю</h3></div><span class="dinner-day" id="dinner-date">Сьогодні</span></div><p class="dinner-description">Не омлет із сиром. Щодня 5 цікавих страв із авторської добірки з урахуванням наших харчових побажань.</p><div class="dinner-list" id="recipe-list" aria-label="П’ять страв на сьогодні"></div><p class="dinner-footnote">Нові ідеї після 00:00 за часом Німеччини. Натисни на страву, щоб побачити інгредієнти на 2 порції та додати відсутні у покупки. Перед готуванням перевір стан продуктів.</p></div>
       <div class="smart-panel"><h3>Спитай Поличку ✳</h3><p>Можна використати NVIDIA NIM через захищену функцію Vercel. Без ключа працює локальний підбір рецептів вище.</p><label class="field-label" for="ai-question">Твоє питання</label><textarea class="smart-input" id="ai-question" rows="3" style="height:87px;resize:vertical" maxlength="450" placeholder="Що приготувати на вечерю без походу в магазин?"></textarea><button class="primary" type="button" id="ask-ai">Отримати пораду</button><div id="ai-response" class="smart-output" hidden></div><p class="smart-caption">ШІ доступний лише після налаштування NVIDIA та авторизованого Telegram-входу; не надсилай сюди особисті дані.</p></div>
       <div class="smart-panel"><h3>Витрати та покупки</h3><div class="summary-grid"><div class="summary-box"><small>За чеками (30 днів)</small><b id="spent-30">0 €</b></div><div class="summary-box"><small>Чеків у базі</small><b id="receipts-count">0</b></div></div><label class="field-label" for="monthly-budget">Бюджет продуктів на місяць, €</label><div class="smart-row"><input class="smart-input" id="monthly-budget" type="number" min="0" max="100000" step="1" value="0"><button class="outline-small" type="button" id="save-budget">Зберегти</button></div><p id="budget-hint" class="smart-caption"></p></div>
       <div class="smart-panel price-panel" id="market-prices-panel"><div class="between"><h3>Ціни по магазинах</h3><span class="badge-source">ВІДКРИТІ ДАНІ</span></div><p class="smart-caption" style="margin-top:7px">Фактичні ціни з твоїх чеків + спостереження Open Prices. Це не гарантований прайс на сьогодні. Порівнюємо лише однакові штрихкоди; акції, дату й місто показуємо окремо.</p><div class="smart-row" style="margin-top:12px"><button type="button" id="refresh-market-prices" class="outline-small">↻ Перевірити ціни</button><span class="smart-caption" id="market-refresh-note" aria-live="polite">Оновлюємо не частіше разу на добу.</span></div><div id="market-price-list" class="market-price-list"></div><p class="smart-caption">Дані: <a href="https://prices.openfoodfacts.org" rel="noopener noreferrer" target="_blank">Open Prices / Open Food Facts</a> (ODbL). Ціна з чека не змінюється при оновленні інтернет-ціни.</p></div><div class="smart-panel"><div class="between"><h3>Останні дії</h3><button type="button" class="text-btn" id="clear-history">Очистити</button></div><div id="audit-list" class="audit-list"></div></div>
@@ -449,12 +461,18 @@ body.theme-cozy button:focus-visible{outline-color:#ac96c6}
   </nav>
 </div>
 <dialog id="settings-dialog" aria-labelledby="settings-title"><div class="sheet style-sheet">
-  <div class="sheet-header"><h2 id="settings-title">Оформлення Полички</h2><button type="button" class="close" id="settings-close" aria-label="Закрити налаштування">×</button></div>
+  <div class="sheet-header"><h2 id="settings-title">Налаштування Полички</h2><button type="button" class="close" id="settings-close" aria-label="Закрити налаштування">×</button></div>
   <p class="style-intro">Обирай свій стиль. Продукти, рецепти, покупки та терміни залишаються спільними.</p>
   <div class="theme-options" role="group" aria-label="Стиль інтерфейсу">
     <button type="button" class="theme-choice" data-theme-choice="classic" aria-pressed="true"><span class="style-preview pop" aria-hidden="true"></span><span class="theme-copy"><strong>Стиль 1 · Попарт</strong><small>Яскраві кольори, графічні рамки, папки.</small></span><span class="theme-indicator" aria-hidden="true"></span></button>
     <button type="button" class="theme-choice" data-theme-choice="cozy" aria-pressed="false"><span class="style-preview cozy" aria-hidden="true"></span><span class="theme-copy"><strong>Стиль 2 · Ніжний</strong><small>М’ята, беж, бузковий. Затишний планер і стрічка категорій.</small></span><span class="theme-indicator" aria-hidden="true"></span></button>
-  </div><p class="theme-note">Вибір зберігається на цьому пристрої окремо для Telegram-акаунта. Він не змінює оформлення іншої людини.</p>
+  </div><p class="theme-note">Стиль зберігається окремо на кожному пристрої та не змінює вигляд іншого акаунта.</p>
+  <div class="diet-settings" role="group" aria-label="Харчові побажання"><h3>Наші побажання до меню</h3>
+    <p>Діють для спільного холодильника, добірок вечері, пошуку рецептів і порад ШІ.</p>
+    <label class="diet-choice"><input type="checkbox" id="diet-avoid-mushrooms" data-diet="avoidMushrooms" checked><span><strong>Майже без грибів</strong><small>Не пропонувати грибні страви автоматично.</small></span></label>
+    <label class="diet-choice"><input type="checkbox" id="diet-avoid-frozen" data-diet="avoidFrozenVegetables" checked><span><strong>Без заморожених овочів</strong><small>Надавати перевагу свіжим, за потреби консервованим.</small></span></label>
+    <p>Пошук конкретної страви з цими продуктами залишається доступним, якщо захочеться виняток.</p>
+  </div>
 </div></dialog>
 <dialog id="product-dialog" aria-labelledby="dialog-title"><div class="sheet"><div class="sheet-header"><h2 id="dialog-title">Новий продукт</h2><button class="close" id="close-dialog" aria-label="Закрити" type="button">×</button></div><form id="product-form"><div class="form-grid"><div class="form-group full"><label for="f-name">Назва продукту</label><input id="f-name" required maxlength="65" placeholder="Наприклад, молоко" autocomplete="off"/></div><div class="form-group full"><label for="f-category">Категорія</label><select id="f-category"><option value="dairy">Молочне</option><option value="fruit">Овочі і фрукти</option><option value="meat">М'ясо та риба</option><option value="bakery">Хліб і випічка</option><option value="other">Інше</option></select></div><div class="form-group"><label for="f-qty">Зараз є</label><input id="f-qty" type="number" min="0" max="100000" step="any" required value="1"/></div><div class="form-group"><label for="f-unit">Одиниця виміру</label><select id="f-unit"><option value="шт">шт</option><option value="уп.">уп.</option><option value="л">л</option><option value="кг">кг</option><option value="г">г</option></select></div><div class="form-group"><label for="f-min">Коли нагадати купити</label><input id="f-min" type="number" min="0" max="100000" step="any" required value="1"/><p class="form-help">Додати у покупки, коли залишиться стільки або менше.</p></div><div class="form-group"><label for="f-target">Скільки хочеш мати</label><input id="f-target" type="number" min="0.01" max="100000" step="any" required value="3"/><p class="form-help">До цього рівня поповнимо запас після покупки.</p></div><div class="form-group full"><label for="f-expiry">Придатний до (необов'язково)</label><input id="f-expiry" type="date"/></div>
       <div class="form-group"><label for="f-price">Ціна за одиницю, €</label><input id="f-price" type="number" step="0.01" min="0" max="100000" placeholder="0.00"/></div>
@@ -1829,9 +1847,9 @@ window.InlineQRCode=req('index');
     const shopping=raw.shopping.slice(0,600).filter(i=>i&&String(i.name||'').trim()).map(i=>({id:String(i.id||uid()).slice(0,100),name:String(i.name).trim().slice(0,65),updatedAt:validTimestamp(i.updatedAt)}));
     const receipts=Array.isArray(raw.receipts)?raw.receipts.slice(-100).filter(x=>x&&Number.isFinite(Number(x.total))).map(x=>({id:String(x.id||uid()).slice(0,100),date:String(x.date||''),store:validStore(x.store)||detectStore(x.store),total:Math.max(0,Math.min(100000,Number(x.total))),updatedAt:validTimestamp(x.updatedAt)})):[];
     const events=Array.isArray(raw.events)?raw.events.slice(-100).filter(x=>x&&x.text).map(x=>({id:String(x.id||`${x.at||''}:${x.text}`).slice(0,100),text:String(x.text).slice(0,150),at:String(x.at||'').slice(0,40),updatedAt:validTimestamp(x.updatedAt||x.at)})):[];
-    return {version:4,items,shopping,receipts,events,weeklyMenu:normalizeWeeklyMenu(raw.weeklyMenu),settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0)),updatedAt:validTimestamp(raw.settings?.updatedAt)},deleted:{items:tombstones(raw.deleted?.items),shopping:tombstones(raw.deleted?.shopping),receipts:tombstones(raw.deleted?.receipts),events:tombstones(raw.deleted?.events)}};
+    return {version:4,items,shopping,receipts,events,weeklyMenu:normalizeWeeklyMenu(raw.weeklyMenu),settings:{budget:Math.max(0,Math.min(100000,Number(raw.settings?.budget??0)||0)),avoidMushrooms:raw.settings?.avoidMushrooms!==false,avoidFrozenVegetables:raw.settings?.avoidFrozenVegetables!==false,updatedAt:validTimestamp(raw.settings?.updatedAt)},deleted:{items:tombstones(raw.deleted?.items),shopping:tombstones(raw.deleted?.shopping),receipts:tombstones(raw.deleted?.receipts),events:tombstones(raw.deleted?.events)}};
   }
-  const emptyState=()=>({version:4,items:[],shopping:[],receipts:[],events:[],weeklyMenu:{startDate:'',days:[],prices:[],estimatedVerifiedSubtotal:null,unpriced:[]},settings:{budget:0},deleted:{items:{},shopping:{},receipts:{},events:{}}});
+  const emptyState=()=>({version:4,items:[],shopping:[],receipts:[],events:[],weeklyMenu:{startDate:'',days:[],prices:[],estimatedVerifiedSubtotal:null,unpriced:[]},settings:{budget:0,avoidMushrooms:true,avoidFrozenVegetables:true},deleted:{items:{},shopping:{},receipts:{},events:{}}});
   let state;try{const saved=localStorage.getItem(STORAGE_KEY);const parsed=saved?JSON.parse(saved):emptyState();state=normalize(parsed?.demo===true?emptyState():parsed);}catch(e){state=normalize(emptyState());}
   let tab='stock', filter='all', editing=null, toastTimer;
   let syncRevision=0,syncReady=false,syncInProgress=false,syncQueued=false,syncApplyingRemote=false,syncTimer=null,localGeneration=0;
@@ -1856,7 +1874,7 @@ window.InlineQRCode=req('index');
       const entries=Object.entries(state.deleted[key]);
       if(entries.length>5000)state.deleted[key]=Object.fromEntries(entries.sort((a,b)=>Date.parse(b[1])-Date.parse(a[1])).slice(0,5000));
     }
-    if(previous.settings?.budget!==state.settings?.budget)state.settings.updatedAt=now;
+    if(previous.settings?.budget!==state.settings?.budget||previous.settings?.avoidMushrooms!==state.settings?.avoidMushrooms||previous.settings?.avoidFrozenVegetables!==state.settings?.avoidFrozenVegetables)state.settings.updatedAt=now;
     if(JSON.stringify({...previous.weeklyMenu,updatedAt:''})!==JSON.stringify({...state.weeklyMenu,updatedAt:''}))state.weeklyMenu.updatedAt=now;
     const changed=before!==JSON.stringify(state);
     lastSavedSnapshot=JSON.stringify(state);
@@ -2058,6 +2076,17 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   $('#header-qr').addEventListener('click',()=>setTab('qr'));
   $('#header-settings').addEventListener('click',()=>$('#settings-dialog').showModal());
   $('#settings-close').addEventListener('click',()=>$('#settings-dialog').close());
+  function refreshDietControls(){
+    $('#diet-avoid-mushrooms').checked=state.settings?.avoidMushrooms!==false;
+    $('#diet-avoid-frozen').checked=state.settings?.avoidFrozenVegetables!==false;
+  }
+  document.querySelectorAll('[data-diet]').forEach(input=>input.addEventListener('change',()=>{
+    state.settings[input.dataset.diet]=input.checked;
+    save();refreshDietControls();renderRecipes();
+    catalogCache.clear();
+    if(catalogQuery||catalogCategory!=='all')loadRecipeCatalog(catalogQuery,catalogCategory);
+    showToast('Харчові побажання збережено');
+  }));
   $('#settings-dialog').addEventListener('click',e=>{if(e.target===$('#settings-dialog'))e.target.close();});
   document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>{
     applyVisualTheme(button.dataset.themeChoice);
@@ -2199,6 +2228,20 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   // With 40 dishes in five culinary groups, none repeats during an eight-day cycle.
   const DINNER_POOL=Array.isArray(window.PolychkaDinnerRecipes)?window.PolychkaDinnerRecipes:[];
   const DINNER_GROUPS=Array.from({length:5},(_,group)=>DINNER_POOL.filter(r=>r.group===group));
+  const MUSHROOM_WORDS=/(?:гриб|печериц|шампіньйон|лисичк|глив|опеньк|трюфел|mushroom|champignon|shiitake|oyster\s+mushroom|pilz|trüffel)/iu;
+  const FREEZER_WORDS=/(?:заморож|морожен|frozen|tiefkühl|tiefgefror|\btk[\s-])/iu;
+  const VEGETABLE_WORDS=/(?:овоч|суміш\s+овочів|брокол|моркв|шпинат|капуст|горош|горох|квасол|цвітн|перець|кукурудз|vegetable|broccoli|spinach|peas|carrots|mixed\s+veg|gemüse|erbsen|bohnen)/iu;
+  function frozenVegMention(value){
+    const text=String(value||'');
+    return (FREEZER_WORDS.test(text)&&VEGETABLE_WORDS.test(text))||/(?:овочева\s+суміш|суміш\s+овочів|gemüsemix)/iu.test(text);
+  }
+  function disfavoredRecipe(recipe,query=''){
+    const names=[recipe?.name_uk||'',...(recipe?.ingredients||[]).map(x=>x.name||''),...(recipe?.steps||[])];
+    const text=names.join(' ');
+    if(state.settings?.avoidMushrooms!==false&&!MUSHROOM_WORDS.test(query)&&MUSHROOM_WORDS.test(text))return true;
+    if(state.settings?.avoidFrozenVegetables!==false&&!frozenVegMention(query)&&names.some(frozenVegMention))return true;
+    return false;
+  }
   let lastDinnerDate='';
   function berlinDinnerDate(){
     // sv-SE formats yyyy-mm-dd and avoids clock/timezone ambiguity at midnight.
@@ -2210,7 +2253,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     const rotation=[0,2,4,6,1];
     const order=Array.from({length:5},(_,i)=>(i+ordinal%5)%5);
     return order.map(group=>{
-      const family=DINNER_GROUPS[group];
+      const family=DINNER_GROUPS[group].filter(recipe=>!disfavoredRecipe(recipe));
       if(!family?.length)return null;
       return family[(ordinal+rotation[group])%family.length];
     }).filter(Boolean);
@@ -2246,6 +2289,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     if(document.visibilityState==='visible'&&berlinDinnerDate()!==lastDinnerDate)renderRecipes();
   });
   function renderSmart(){
+    refreshDietControls();
     const expiring=state.items.filter(i=>i.qty>0&&i.expiry&&daysLeft(i.expiry)<=3);
     const outdated=expiring.filter(i=>daysLeft(i.expiry)<0);
     const lacking=restock();
@@ -2644,7 +2688,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
   async function loadRecipeCatalog(query='',category='all'){
     catalogQuery=String(query||'').trim().slice(0,65);
     catalogCategory=category;catalogVisibleCount=6;
-    const sequence=++catalogRequestSeq,key=category+'|'+catalogQuery.toLocaleLowerCase('uk');
+    const sequence=++catalogRequestSeq,key=category+'|'+catalogQuery.toLocaleLowerCase('uk')+'|'+Number(state.settings?.avoidMushrooms!==false)+'|'+Number(state.settings?.avoidFrozenVegetables!==false);
     $('#catalog-recipe-query').value=catalogQuery;
     document.querySelectorAll('[data-recipe-category]').forEach(b=>b.classList.toggle('active',b.dataset.recipeCategory===category));
     if(!catalogQuery&&category==='all'){
@@ -2667,7 +2711,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
       const data=await response.json();
       if(!response.ok)throw Error(data.error||'Помилка каталогу');
       if(sequence!==catalogRequestSeq)return;
-      catalogRecipes=Array.isArray(data.recipes)?data.recipes:[];
+      catalogRecipes=(Array.isArray(data.recipes)?data.recipes:[]).filter(recipe=>!disfavoredRecipe(recipe,catalogQuery));
       catalogCache.set(key,catalogRecipes);
       if(catalogCache.size>55)catalogCache.delete(catalogCache.keys().next().value);
       $('#catalog-status').textContent='Знайдено рецептів: '+catalogRecipes.length+
@@ -2862,7 +2906,7 @@ function render(){renderStock();renderShopping();renderPlan();renderSmart();rend
     btn.disabled=true;el.hidden=false;el.textContent='Питаємо NVIDIA…';
     try{
       const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),26000);
-      let response;try{response=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData,question:q,items:state.items.filter(x=>x.qty>0).slice(0,80).map(x=>({name:x.name,qty:x.qty,unit:x.unit,expiry:x.expiry}))}),signal:controller.signal});}finally{clearTimeout(timeout);}
+      let response;try{response=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData,question:q,preferences:{avoidMushrooms:state.settings?.avoidMushrooms!==false,avoidFrozenVegetables:state.settings?.avoidFrozenVegetables!==false},items:state.items.filter(x=>x.qty>0).slice(0,80).map(x=>({name:x.name,qty:x.qty,unit:x.unit,expiry:x.expiry}))}),signal:controller.signal});}finally{clearTimeout(timeout);}
       const data=await response.json();
       if(!response.ok){const error=Error(data.error||`Помилка API ${response.status}`);error.status=response.status;error.code=data.code||'';throw error;}
       el.textContent=data.answer||'Немає відповіді';
